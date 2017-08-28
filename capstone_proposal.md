@@ -23,7 +23,8 @@ The dataset contains a large number of car images(as .jpg files) of different ma
 ![0cdf5b5d0ce1_04](/images/0cdf5b5d0ce1_04.jpg)
 For training we are provided with with a .gif file that contains the manually cutout mask for each image.
 ![0cdf5b5d0ce1_04](/images/0cdf5b5d0ce1_04_mask.gif)
-This dataset can be obtained from the [Kaggle Challenge](https://www.kaggle.com/c/carvana-image-masking-challenge/data).  So, the main objective of the problem is to create an image mask, given an unseen image of an automobile. However, to simplify the submissions and evaluation, the final output is required to be converted into run-length encoded format.  
+This dataset can be obtained from the [Kaggle Challenge](https://www.kaggle.com/c/carvana-image-masking-challenge/data).  So, the main objective of the problem is to create an image mask, given an unseen image of an automobile. However, to simplify the submissions and evaluation, the final output is required to be converted into run-length encoding on the pixel values. Instead of an exhaustive list of indices for segmentation, we will generate pair of values that contain a start position and a run length. A sample output can be found [here](sample_submission.csv).
+
 
 ### Solution Statement
 _(approx. 1 paragraph)_
