@@ -28,7 +28,8 @@ This dataset can be obtained from the [Kaggle Challenge](https://www.kaggle.com/
 
 ### Solution Statement
 
-As I mentioned briefly before, we can use deep learning to create an output mask for a given image. Specifically we use a U-Net architecture for doing segmentation. U-Net models have been successfully applied in medical image segmentation problems without creating a very deep architecture. The reason we use deep learning is because traditional computer vision techniques might need to be engineered for various car poses or various models separately, and might not give satisfactory results. A deep learning model would be able to generalize better over the problem domain. 
+As I mentioned briefly before, we can use deep learning to create an output mask for a given image. Specifically we use a U-Net architecture for doing segmentation. U-Net models have been successfully applied in [medical image segmentation](https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/) problems without creating a very deep architecture. The reason we use deep learning is because traditional computer vision techniques might need to be engineered for various car poses or various models separately, and might not give satisfactory results. A deep learning model would be able to generalize better over the problem domain. 
+![alt](/images/unet.png)
 
 ### Benchmark Model
 
