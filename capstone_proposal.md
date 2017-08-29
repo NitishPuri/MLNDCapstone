@@ -39,7 +39,7 @@ This model would generate an image mask that can then be evaluated using the met
 ### Evaluation Metrics
 
 [Dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient) can be used as an evaluation metric for the problem. It can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:   
-![alt](/images/metric.svg)   
+![alt](/images/metric.png)   
 where X is the predicted set of pixels and Y is the ground truth. The Dice coefficient is defined to be 1 when both X and Y are empty. The final score can be calculated as the mean of the Dice coefficients for each image in the test set.   
 
 ### Project Design
