@@ -27,18 +27,18 @@ This dataset can be obtained from the [Kaggle Challenge](https://www.kaggle.com/
 
 
 ### Solution Statement
-_(approx. 1 paragraph)_
 
-In this section, clearly describe a solution to the problem. The solution should be applicable to the project domain and appropriate for the dataset(s) or input(s) given. Additionally, describe the solution thoroughly such that it is clear that the solution is quantifiable (the solution can be expressed in mathematical or logical terms) , measurable (the solution can be measured by some metric and clearly observed), and replicable (the solution can be reproduced and occurs more than once).
+As I mentioned briefly before, we can use deep learning to create an output mask for a given image. This can be achieved be creating a network of fully convolution layers that `encode` the image into features by downsampling and then `decode` the features to an image mask of the same resolution as an input by upsampling. The reason we use deep learning is because traditional computer vision techniques might need to be engineered for various car poses or various models separately, and might not give satisfactory results. A deep learning model would be able to generalize better over the problem domain. 
 
 ### Benchmark Model
-_(approximately 1-2 paragraphs)_
+
 
 In this section, provide the details for a benchmark model or result that relates to the domain, problem statement, and intended solution. Ideally, the benchmark model or result contextualizes existing methods or known information in the domain and problem given, which could then be objectively compared to the solution. Describe how the benchmark model or result is measurable (can be measured by some metric and clearly observed) with thorough detail.
 
 ### Evaluation Metrics
-_(approx. 1-2 paragraphs)_
 
+[Dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient) can be used as an evaluation metric for the problem. It can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:   
+$$ \frac{2 * |X \cap Y|}{|X| + |Y|}$$   
 In this section, propose at least one evaluation metric that can be used to quantify the performance of both the benchmark model and the solution model. The evaluation metric(s) you propose should be appropriate given the context of the data, the problem statement, and the intended solution. Describe how the evaluation metric(s) are derived and provide an example of their mathematical representations (if applicable). Complex evaluation metrics should be clearly defined and quantifiable (can be expressed in mathematical or logical terms).
 
 ### Project Design
