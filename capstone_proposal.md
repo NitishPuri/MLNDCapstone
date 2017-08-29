@@ -38,8 +38,8 @@ In this section, provide the details for a benchmark model or result that relate
 ### Evaluation Metrics
 
 [Dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient) can be used as an evaluation metric for the problem. It can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:   
-$$ \frac{2 * |X \cap Y|}{|X| + |Y|}$$   
-In this section, propose at least one evaluation metric that can be used to quantify the performance of both the benchmark model and the solution model. The evaluation metric(s) you propose should be appropriate given the context of the data, the problem statement, and the intended solution. Describe how the evaluation metric(s) are derived and provide an example of their mathematical representations (if applicable). Complex evaluation metrics should be clearly defined and quantifiable (can be expressed in mathematical or logical terms).
+![alt](/images/metric.svg)   
+where X is the predicted set of pixels and Y is the ground truth. The Dice coefficient is defined to be 1 when both X and Y are empty. The final score can be calculated as the mean of the Dice coefficients for each image in the test set.   
 
 ### Project Design
 _(approx. 1 page)_
