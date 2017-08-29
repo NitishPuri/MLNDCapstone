@@ -15,7 +15,7 @@ The challenge is organized by [Carvana](https://www.carvana.com/). An interestin
 
 ### Problem Statement
 
-As mentioned in the previous section, we are provided with 16 standard images(1918 X 1280) of each vehicle in their inventory. We also have a corresponding image mask(1918 X 1280) for each input image. The problem is in automatically create an image mask for unseen images of automobiles in a similar setting. One potential solution that I could immediately come think of was using Deep Neural Network, starting with *Convolution* layers, extracting image features and then using *De-Convolution* to map the features back into original image dimensions. This would identify each pixel from the original image as either belonging to the automobile or the background. The background pixels can then be masked to create an image mask for the given image.
+As mentioned in the previous section, we are provided with 16 standard images(1918 X 1280) of each vehicle in their inventory. We also have a corresponding image mask(1918 X 1280) for each input image. The problem is in automatically create an image mask for unseen images of automobiles in a similar setting. One potential solution that I could immediately come think of was using Deep Neural Network that would label each pixel of the input image as belonging to background or automobile. The background pixels can then be masked to create an image mask for the given image.
 
 ### Datasets and Inputs
 
@@ -28,12 +28,13 @@ This dataset can be obtained from the [Kaggle Challenge](https://www.kaggle.com/
 
 ### Solution Statement
 
-As I mentioned briefly before, we can use deep learning to create an output mask for a given image. This can be achieved be creating a network of fully convolution layers that `encode` the image into features by downsampling and then `decode` the features to an image mask of the same resolution as an input by upsampling. The reason we use deep learning is because traditional computer vision techniques might need to be engineered for various car poses or various models separately, and might not give satisfactory results. A deep learning model would be able to generalize better over the problem domain. 
+As I mentioned briefly before, we can use deep learning to create an output mask for a given image. Specifically we use a U-Net architecture for doing segmentation. U-Net models have been successfully applied in medical image segmentation problems without creating a very deep architecture. The reason we use deep learning is because traditional computer vision techniques might need to be engineered for various car poses or various models separately, and might not give satisfactory results. A deep learning model would be able to generalize better over the problem domain. 
 
 ### Benchmark Model
 
-
-In this section, provide the details for a benchmark model or result that relates to the domain, problem statement, and intended solution. Ideally, the benchmark model or result contextualizes existing methods or known information in the domain and problem given, which could then be objectively compared to the solution. Describe how the benchmark model or result is measurable (can be measured by some metric and clearly observed) with thorough detail.
+There are several traditional computer vision approaches that can be used to mask objects, however, these techniques would require you to engineer an image processing pipeline with carefully selected steps to generate a mask. We can instead use a coarser neural network model consisting of only fully connected convolution layers. The model would look something like this,   
+![alt](/images/bench.png)
+This model would generate an image mask that can then be evaluated using the metric defined in the next section. 
 
 ### Evaluation Metrics
 
@@ -42,16 +43,17 @@ In this section, provide the details for a benchmark model or result that relate
 where X is the predicted set of pixels and Y is the ground truth. The Dice coefficient is defined to be 1 when both X and Y are empty. The final score can be calculated as the mean of the Dice coefficients for each image in the test set.   
 
 ### Project Design
-_(approx. 1 page)_
 
-In this final section, summarize a theoretical workflow for approaching a solution given the problem. Provide thorough discussion for what strategies you may consider employing, what analysis of the data might be required before being used, or which algorithms will be considered for your implementation. The workflow and discussion that you provide should align with the qualities of the previous sections. Additionally, you are encouraged to include small visualizations, pseudocode, or diagrams to aid in describing the project design, but it is not required. The discussion should clearly outline your intended workflow of the capstone project.
+Image segmentation is a part of a broader range of problems involving object detection, localization and instance detection. All these problems can now be addressed by CNN models. I am going to create a simplified model(simplest architecture) that can achieve acceptable results by following these simple approaches:
+* Use lower resolution imagery.
+* Increase the amount of test data by augmentation.
+* Generate more test data by using a rendering engine.
 
------------
+The aim here is to generate a lightweight model that can do generate a background mask.   
 
-**Before submitting your proposal, ask yourself. . .**
+### References   
 
-- Does the proposal you have written follow a well-organized structure similar to that of the project template?
-- Is each section (particularly **Solution Statement** and **Project Design**) written in a clear, concise and specific fashion? Are there any ambiguous terms or phrases that need clarification?
-- Would the intended audience of your project be able to understand your proposal?
-- Have you properly proofread your proposal to assure there are minimal grammatical and spelling mistakes?
-- Are all the resources used for this project correctly cited and referenced?
+* [Carvana Image Masking Chalenge](https://www.kaggle.com/c/carvana-image-masking-challenge)
+* [Convolution Networks for Visual Recognition](http://cs231n.github.io/)
+* [U-Net: Convolutional Networks for Biomedical Image Segmentation](https://arxiv.org/abs/1505.04597)
+
