@@ -44,12 +44,32 @@ where X is the predicted set of pixels and Y is the ground truth. The Dice coeff
 
 ### Project Design
 
-Image segmentation is a part of a broader range of problems involving object detection, localization and instance detection. All these problems can now be addressed by CNN models. I am going to create a simplified model(simplest architecture) that can achieve acceptable results by following these simple approaches:
+Image segmentation is a part of a broader range of problems involving object detection, localization and instance detection. All these problems can now be addressed by CNN models. I am going to create a simplified model that can achieve acceptable results by following these simple approaches:
 * Use lower resolution imagery.
 * Increase the amount of test data by augmentation.
 * Generate more test data by using a rendering engine.
 
-The aim here is to generate a lightweight model that can do generate a background mask.   
+The aim here is to generate a lightweight model that can generate a background mask.   
+
+I will be using Keras(with Tensorflow) for building and training the CNN. Keras seems to be a good choice because of the nice utils available both in Keras and Tensorflow for creating network graphs, visualizations, serialization and much more.     
+
+Here is a high level workflow for the project:
+* Initial data exploration: Discuss the input and output attributes like resolution, number of training examples etc..
+* Data Pre/Post processing: Check what kind of pre/post processing we need and implement functions..
+    * Change input resolution.
+    * Input data normalization.
+    * Use HSV instead of RGB color space.
+    * Convert output mask to run-length encoding.
+    * Randomize input data.
+* Implement the benchmark and report its score.
+* Build the first implementation of solution network and train with a random subset of samples for say 50 epochs.
+* Tune Hyperparameters like `epochs`, `batch_size`, `dropout_probability`, etc.(whichever are available).
+* Repeat the previous two steps until satisfactory learning model is achieved.
+* Run the final model with the complete data (that maybe runs a little longer than the previously trained model).
+* Test the model on available test set and report accuracy.
+* Visualize test results.
+* For free-form visualization : Play with tensorBoard and see the trends in hyperparameter tuning.
+
 
 ### References   
 
