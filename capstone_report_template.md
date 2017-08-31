@@ -1,23 +1,47 @@
 # Machine Learning Engineer Nanodegree
 ## Capstone Project
-Joe Udacity  
-December 31st, 2050
+Nitish Puri  
+August 31st, 2017
+
+## Using Deep Learning for Image Masking
 
 ## I. Definition
-_(approx. 1-2 pages)_
 
 ### Project Overview
-In this section, look to provide a high-level overview of the project in layman’s terms. Questions to ask yourself when writing this section:
-- _Has an overview of the project been provided, such as the problem domain, project origin, and related datasets or input data?_
-- _Has enough background information been given so that an uninformed reader would understand the problem domain and following problem statement?_
+
+One of the reason I decided to do the Machine Learning Nanodegree was my growing interest in
+computational perception. There are several closely related perception problems that are being 
+addressed using the rapidly emerging field of deep learning. This project is one variant of the 
+problem of [Image Segmenation](https://en.wikipedia.org/wiki/Image_segmentation) inspired from 
+the [Kaggle Image Masking Challenge](https://www.kaggle.com/c/carvana-image-masking-challenge).   
+
+Historically, the problem of image segmentation has been solved by using traditional Computer 
+vision principles like k-means clustering, thresholding, edge detection and even lossy compression 
+techniques. These techniques require careful engineering of the image pipeline, which can differ a lot 
+between different problems or different datasets.The problem of image segmentation has been studied in 
+various domains ranging from robot perception to medical image analysis and the results obtained and 
+models created are transferable to these domains as well.
+
+The challenge is organized by [Carvana](https://www.carvana.com/). An interesting part of their innovation is a custom rotating photo studio that automatically captures and processes 16 standard images of each vehicle in their inventory. While they capture high quality photos, bright reflections and cars with similar colors as the background cause automation errors, which requires a skilled photo editor to fix. In this project we are going to develop an algorithm that automatically removes the photo studio background. This will allow Carvana to superimpose cars on a variety of backgrounds. We will be analyzing a dataset of photos, covering different vehicles with a wide variety of year, make and model combinations.
+![problem](images/carvana_graphics.png)
 
 ### Problem Statement
-In this section, you will want to clearly define the problem that you are trying to solve, including the strategy (outline of tasks) you will use to achieve the desired solution. You should also thoroughly discuss what the intended solution will be for this problem. Questions to ask yourself when writing this section:
-- _Is the problem statement clearly defined? Will the reader understand what you are expecting to solve?_
-- _Have you thoroughly discussed how you will attempt to solve the problem?_
-- _Is an anticipated solution clearly defined? Will the reader understand what results you are looking for?_
+As mentioned in the previous section, we are provided with 16 standard images(1918 X 1280) of each 
+vehicle(318 vehicle categories for the training data) in their inventory. We also have a corresponding image mask(1918 X 1280) for each input 
+image. The problem is in automatically create an image mask for unseen images of automobiles in a 
+similar setting. One potential solution that I could immediately come think of was using Deep Neural 
+Network that would label each pixel of the input image as belonging to background or automobile. The 
+background pixels can then be masked to create an image mask for the given image.   
+Specifically we will be using a U-net architecture that use Convolution layers to generate pixel level classification on the input image. These architectures are discussed in the following sections in more detail.
 
 ### Metrics
+
+[Dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient) can be used as an evaluation metric for the problem. It can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:   
+![alt](images/metric.png)   
+where X is the predicted set of pixels and Y is the ground truth. The Dice coefficient is defined to be 1 when both X and Y are empty. For example consider these two example 5X5 image masks.
+
+The final score can be calculated as the mean of the Dice coefficients for each image in the test set.   
+
 In this section, you will need to clearly define the metrics or calculations you will use to measure performance of a model or result in your project. These calculations and metrics should be justified based on the characteristics of the problem and problem domain. Questions to ask yourself when writing this section:
 - _Are the metrics you’ve chosen to measure the performance of your models clearly discussed and defined?_
 - _Have you provided reasonable justification for the metrics chosen based on the problem and solution?_
