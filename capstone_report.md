@@ -39,7 +39,7 @@ Specifically we will be using a U-net architecture that use Convolution layers t
 [Dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient) can be used as an evaluation metric for the problem. Dice coefficient is a statistic used for comparing the similarity of two samples. Its range goes from *0* meaning no similarity to *1* meaning maximum similarity. It can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:   
 ![alt](images/metric.png)   
 where X is the predicted set of pixels and Y is the ground truth. The Dice coefficient is defined to be 1 when both X and Y are empty. For example consider these two example 5X5 image masks.   
-![alt](images.metricEx.png)   
+![alt](images/metricEx.png)   
 
 Here,   
 X = 8,   
@@ -56,6 +56,13 @@ The final score can be calculated as the mean of the Dice coefficients for each 
 _(approx. 2-4 pages)_
 
 ### Data Exploration
+
+Here are some of the questions that i wanted to answer while progressing through this project.
+
+* Can I train a model to predict the manufacturer?
+* Background is always the same. how can i take advantage of that? 
+* How do we/network deel with the reflections?
+
 In this section, you will be expected to analyze the data you are using for the problem. This data can either be in the form of a dataset (or datasets), input data (or input files), or even an environment. The type of data should be thoroughly described and, if possible, have basic statistics and information presented (such as discussion of input features or defining characteristics about the input or environment). Any abnormalities or interesting qualities about the data that may need to be addressed have been identified (such as features that need to be transformed or the possibility of outliers). Questions to ask yourself when writing this section:
 - _If a dataset is present for this problem, have you thoroughly discussed certain features about the dataset? Has a data sample been provided to the reader?_
 - _If a dataset is present for this problem, are statistics about the dataset calculated and reported? Have any relevant results from this calculation been discussed?_
