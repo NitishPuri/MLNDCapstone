@@ -47,7 +47,7 @@ Y = 8,
 X & Y = 6   
 
 So, 
-QS = (2 * 6)/(8 + 8)
+QS = (2 * 6)/(8 + 8)   
 QS = 0.75    
 
 The final score can be calculated as the mean of the Dice coefficients for each image in the test set.   
@@ -61,7 +61,17 @@ Here are some of the questions that i wanted to answer while progressing through
 
 * Can I train a model to predict the manufacturer?
 * Background is always the same. how can i take advantage of that? 
-* How do we/network deel with the reflections?
+* How do we/network deal with the reflections?
+
+Since this is a Kaggle competition, we already have separate test and train data available.   
+Training data is in the form of (1280 X 1918) RGB images. Each image has an associated metadata, 
+| id           	| year   	| make      	| model  	| trim1  	| trim2                   	|
+|--------------	|--------	|-----------	|--------	|--------	|-------------------------	|
+| 0004d4463b50 	| 2014.0 	| Acura     	| TL     	| TL     	| w/SE                    	|
+| 00087a6bd4dc 	| 2014.0 	| Acura     	| RLX    	| RLX    	| w/Tech                  	|
+| 000aa097d423 	| 2012.0 	| Mazda     	| MAZDA6 	| MAZDA6 	| i Sport                 	|
+| 000f19f6e7d4 	| 2016.0 	| Chevrolet 	| Camaro 	| Camaro 	| SS                      	|
+| 00144e887ae9 	| 2015.0 	| Acura     	| TLX    	| TLX    	| SH-AWD V6 w/Advance Pkg 	|
 
 In this section, you will be expected to analyze the data you are using for the problem. This data can either be in the form of a dataset (or datasets), input data (or input files), or even an environment. The type of data should be thoroughly described and, if possible, have basic statistics and information presented (such as discussion of input features or defining characteristics about the input or environment). Any abnormalities or interesting qualities about the data that may need to be addressed have been identified (such as features that need to be transformed or the possibility of outliers). Questions to ask yourself when writing this section:
 - _If a dataset is present for this problem, have you thoroughly discussed certain features about the dataset? Has a data sample been provided to the reader?_
