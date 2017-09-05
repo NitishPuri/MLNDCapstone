@@ -1,3 +1,4 @@
+# %load utils/preprocess.py
 import numpy as np
 from scipy import ndimage
 from matplotlib import pyplot as plt
@@ -10,14 +11,14 @@ def randomHueSaturationVariation(image, hue_shift_limit =(-180, 180), sat_shift_
                                  val_shift_limit = (-255, 255), u = 0.5 ):
     if np.random.random() < u :
         image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        h, c, v = cv2.split(image)
+        h, s, v = cv2.split(image)
         hue_shift = np.random.uniform(hue_shift_limit[0], hue_shift_limit[1])
         h = cv2.add(h, hue_shift)
-        sat_shift = np.random.uniform(sat_shift_limit[0]. sat_shift_limit[1])
+        sat_shift = np.random.uniform(sat_shift_limit[0], sat_shift_limit[1])
         s = cv2.add(s, sat_shift)
         val_shift = np.random.uniform(val_shift_limit[0], val_shift_limit[1])
         v = cv2.add(v, val_shift)
-        image = cv2.merge(h, s, v)
+        image = cv2.merge((h, s, v))
         image = cv2.cvtColor(image, cv2.COLOR_HSV2BGR)
     
     return image
@@ -65,4 +66,19 @@ def randomHorizontalFlip(image, mask, u=0.5):
         image = cv2.flip(image, 1)
         mask = cv2.flip(mask, 1)
 
+    return image, mask
+
+def randomCrop(image, mask, u = 0.5):
+    if np.random.random() < u:
+        height, width, channel = image.shape
+        cropL = int(np.random.uniform(0, width/50))
+        cropR = int(np.random.uniform(0, width/50))
+        cropT = int(np.random.uniform(0, width/50))
+        cropB = int(np.random.uniform(0, width/50))
+        image = image[cropT:height-cropB, cropL:width - cropR]
+        image = resize(image)
+        
+        mask = mask[cropT:height-cropB, cropL:width - cropR]
+        mask = resize(mask)
+        
     return image, mask
