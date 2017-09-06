@@ -1,4 +1,5 @@
-from utils.params import *
+from utils.filename import *
+from utils.image import *
 
 def train_manufacturer_gen():
     while True:
@@ -17,5 +18,3 @@ def val_manufacturer_gen():
         img = resize(img)
         label = pd.get_dummies(maker).loc[car_code].values
         yield img.reshape(-1, INPUT_SIZE, INPUT_SIZE, 3), label.reshape(1, -1)
-    
-
