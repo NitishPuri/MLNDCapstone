@@ -1,4 +1,8 @@
+import time
+import numpy as np
 
+from utils.filename import filename_to_code
+from utils.image import read_image
 
 # https://www.kaggle.com/stainsby/fast-tested-rle
 def rle_encode(mask_image):
@@ -17,7 +21,7 @@ def rle_to_string(runs):
     return ' '.join(str(x) for x in runs)
 
 
-def test_rle_encode():
+def test_rle_encode(train_masks):
     test_mask = np.asarray([[0, 0, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1], [0, 0, 0, 0]])
     assert rle_to_string(rle_encode(test_mask)) == '7 2 11 2'
     num_masks = len(train_masks['img'])
@@ -48,5 +52,3 @@ def test_rle_encode():
     print('Time spent stringifying RLEs:', time_stringify, 's, =>', \
             1000*(time_stringify/num_masks), 'ms per mask.')
 
-
-test_rle_encode()

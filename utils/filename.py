@@ -1,4 +1,4 @@
-import utils.params
+from utils.params import *
 
 def filename_to_code(filename):
     car_code, angle_code = filename.split('.')[0].split('_')
