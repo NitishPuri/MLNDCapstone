@@ -1,6 +1,6 @@
-input/train/
-input/train_masks/
-input/zip/
-input/metadata.csv
-input/sample_submission.csv
-input/train_masks.csv
+input/train/*
+input/test/*
+input/train_masks/*
+input/zip/*
+input/*.csv
+ref/
