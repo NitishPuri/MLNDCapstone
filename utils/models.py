@@ -1,7 +1,11 @@
-from keras.models import Model
-from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, Activation, UpSampling2D, BatchNormalization
+from keras.layers import (Activation, BatchNormalization, Conv2D, Input,
+                          MaxPooling2D, UpSampling2D, concatenate)
+from keras.layers import MaxPool2D, GlobalAveragePooling2D, Dense
+from keras.optimizers import Adam, RMSprop                        
+from keras.models import Model, Sequential
 from keras.optimizers import RMSprop
 
+from utils.params import *
 from utils.losses import *
 
 
@@ -25,6 +29,21 @@ def get_manufacturer_model():
     manufacturer_model.add(Dense(36, activation = 'softmax')) # Number of makers in the dataset
 
     manufacturer_model.compile(optimizer = Adam(), loss = 'categorical_crossentropy', metrics = ['accuracy'])
+    return manufacturer_model
+
+def get_baseline_model(input_shape=(128, 128, 3)):
+    
+    baseline_model = Sequential()
+    baseline_model.add( Conv2D(16, kernel_size= (3, 3), activation='relu', padding='same', input_shape=(INPUT_SIZE, INPUT_SIZE, 3)) )
+    baseline_model.add( Conv2D(32, kernel_size= (3, 3), activation='relu', padding='same') )
+    baseline_model.add( Conv2D(1, kernel_size=(5, 5), activation='sigmoid', padding='same') )    
+
+    # baseline_model.summary()
+    # SVG(model_to_dot(baseline_model).create(prog='dot', format='svg'))
+    
+    baseline_model.compile(Adam(lr=1e-3), bce_dice_loss, metrics=['accuracy', dice_coeff])
+
+    return baseline_model
 
 
 def get_unet_128(input_shape=(128, 128, 3),
