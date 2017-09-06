@@ -4,6 +4,7 @@ from scipy import ndimage
 from matplotlib import pyplot as plt
 import seaborn as sns
 import cv2
+from keras.preprocessing import image as kimage
 
 from utils.params import *
 
@@ -27,7 +28,7 @@ def randomShiftScaleRotate(image, mask,
                            shift_limit=(-0.0625, 0.0625),
                            scale_limit=(-0.1, 0.1),
                            rotate_limit=(-45, 45), aspect_limit=(0, 0),
-                           borderMode=cv2.BORDER_CONSTANT, u=0.5):
+                           borderMode=cv2.BORDER_REFLECT, u=0.5):
     if np.random.random() < u:
         height, width, channel = image.shape
 
