@@ -20,6 +20,8 @@ def rle_encode(mask_image):
 def rle_to_string(runs):
     return ' '.join(str(x) for x in runs)
 
+def run_length_encode(mask):
+    return rle_to_string(rle_encode(mask))
 
 def test_rle_encode(train_masks):
     test_mask = np.asarray([[0, 0, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1], [0, 0, 0, 0]])
