@@ -52,6 +52,11 @@ QS = 0.75
 
 The final score can be calculated as the mean of the Dice coefficients for each image in the test set.   
 
+We can convert this to a loss function by using    
+`dice_loss = 1 - QS`   
+
+This can be augmented with `binary_crossenntropy`
+
 ## II. Analysis
 _(approx. 2-4 pages)_
 
@@ -74,21 +79,58 @@ Corresponding to each car image we have a single channel mask. Our goal is to mo
 Here are some samples shown with masks overlaid,   
 ![alt](images/vis2.png)   
 
-Also, we can get a distribution of car manufacturers in the dataset.   
+#### Car manufacturer distribution   
+Also, we can get a distribution of car manufacturers in the complete dataset.   
 ![alt](images/metadata.png)   
+
+These results show the distribution in train and test sets.   
+**Training data**
+![alt](images/train_metadata.png)
+**Test data**
+![alt](images/test_metadata.png)
+
+#### Corrupt data   
+during random visualization of the dataset i was able to find out a few samples that do not have a (nearly)perfect mask. These anomalies are mostly because of very thin apendages such as spoilers or antennas, regular patterns such as wheel spokes or translucent features such as glasses. These samples may cause issues, and we can try to improve the score by removing these samples from the train dataset. However, I have decided to not remove these samples and rely on data augmentation to provide regularization effects against these samples.   
+![alt](images/curroptedF.png)   
+
 
 ### Algorithms and Techniques   
 
+CNNs have been known to perform well for image recognition problems. The next step after classification is segmentation, which has its applications in autonomous driving, human-machine interaction, computational photography, image search engines, augmented reality and medical image diagnostics to name a few. A brief overview of various deep learning techniques is done [here](https://arxiv.org/pdf/1704.06857.pdf).   
+The main idea behind these networks is to output spatial maps instead of classification scores. This is accomplished by replacing *fully connected* layers with *convolution* layer. Here is an illustration from one of the earlier works to use this technique, [Fully Convolution Networks for Semantic Segmentation](https://arxiv.org/abs/1411.4038).   
+![alt](images/fcnSegment.png)   
 
-In this section, you will need to discuss the algorithms and techniques you intend to use for solving the problem. You should justify the use of each one based on the characteristics of the problem and the problem domain. Questions to ask yourself when writing this section:
-- _Are the algorithms you will use, including any default variables/parameters in the project clearly defined?_
-- _Are the techniques to be used thoroughly discussed and justified?_
-- _Is it made clear how the input data or datasets will be handled by the algorithms and techniques chosen?_
+Despite the power and flexibility of the FCN model, it still lacks various features which hinder its application to certain problems and situations: its inherent spatial invariance does not take into account useful global context information, no-instance awareness is present, efficiency is still far from real time execution at high resolutions, and it is not completely suited for unstructured data such as 3D point clouds or models.   
+There have been various different approaches to address these issues, viz. [SegNet]() which uses Encoder-Decoder type network to output a high resolution map.   
+![alt](images/segnet.png)   
 
-### Benchmark
-In this section, you will need to provide a clearly defined benchmark result or threshold for comparing across performances obtained by your solution. The reasoning behind the benchmark (in the case where it is not an established result) should be discussed. Questions to ask yourself when writing this section:
-- _Has some result or value been provided that acts as a benchmark for measuring performance?_
-- _Is it clear how this result or value was obtained (whether by data or by hypothesis)?_
+These methods have received significant success since fine-grained or local information is crucial to achieve good pixel-level accuracy. However, it is also important to integrate information from the global context of the image to be able to resolve local ambiguities. Vanilla CNNs struggle to keep this balance, pooling layers being one of the sources that dispose of global context information. Many approaches have been taken to make Vanilla CNNs aware of the global information. One such approach is multi-scale aggregation[74].
+![alt](images/multiscaleseg.png)   
+
+Here, inputs at different scales is concatenated to output from convolution layers and fed further into the network.   
+In this project we are going to use *u-net*, a variation of the above approach for training and inference. This model has been applied to [medical image segmentation])(https://arxiv.org/abs/1505.04597) on data with segmentation masks. This is very similar to our problem and is a simplified version of the general problem of image segmentation and multiple instance learning with multiple(hundreds) classes.   
+![alt](images/unet.png)
+
+### Benchmark   
+As a benchmark model we can use a simplified CNN architecture containing only a couple of fully convolution layers, without any pooling or downsampling. We use this simple architecture to show that even such a simple model improve its results on the given problem. Though the size of the network and number of learnable parameters may not be sufficient to learn the complexity of the problem at hand.   
+Here is the benchmark network,   
+```python
+baseline_model = Sequential()
+baseline_model.add( Conv2D(16, kernel_size= (3, 3), activation='relu',
+                    padding='same', input_shape=(INPUT_SIZE, INPUT_SIZE, 3)) )
+baseline_model.add( Conv2D(32, kernel_size= (3, 3), activation='relu', padding='same') )
+baseline_model.add( Conv2D(1, kernel_size=(5, 5), activation='sigmoid', padding='same') )
+
+baseline_model.compile(Adam(lr=1e-3), bce_dice_loss, metrics=['accuracy', dice_coef])
+```
+
+where, `INPUT_SIZE = 128` while training for the benchmark. And, the model summary,   
+![alt](images/benchmarkSummary.png)   
+
+Here are the results obtained after *20 epochs* of the above model.
+![alt](images/benchmarkPlot.png)   
+
+**Predictions using the benchmark,..!!!**
 
 
 ## III. Methodology
@@ -163,3 +205,15 @@ In this section, you will need to provide discussion as to how one aspect of the
 - Are all the resources used for this project correctly cited and referenced?
 - Is the code that implements your solution easily readable and properly commented?
 - Does the code execute without error and produce results similar to those reported?
+
+
+### References
+
+1. [Carvana Image Masking Chalenge](https://www.kaggle.com/c/carvana-image-masking-challenge)
+2. [A Review of Deep Learning Techniques Applied to Semantic Segmentation](https://arxiv.org/pdf/1704.06857.pdf)   
+3. [Convolution Networks for Visual Recognition](http://cs231n.github.io/)
+4. [Fully Convolution Networks for Semantic Segmentation](https://arxiv.org/abs/1411.4038)
+5. [SegNet]()
+6. [Multi-Scale Convolutional Architecture for Semantic Segmentation](http://www.ri.cmu.edu/pub_files/2015/10/CMU-RI-TR_AmanRaj_revision2.pdf)   
+7. [U-Net: Convolutional Networks for Biomedical Image Segmentation](https://arxiv.org/abs/1505.04597)
+8. [DeepLab](https://arxiv.org/abs/1606.00915)
