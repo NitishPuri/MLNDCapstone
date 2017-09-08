@@ -9,6 +9,8 @@ from utils.filename import *
 from utils.params import *
 from utils.image import *
 
+from vis.visualization import visualize_activation, get_num_filters
+
 train_masks = data.read_train_masks()
 
 # Sample some images from the dataset and show them in a grid
@@ -152,3 +154,23 @@ def vis_baseline_predictions(baseline_model):
         counter += 1
 
     plt.show()    
+
+## http://nbviewer.jupyter.org/github/raghakot/keras-vis/blob/master/examples/vggnet/activation_maximization.ipynb
+def vis_activation_maximizations(model, layer_idx):
+    num_filters = get_num_filters(model.layers[layer_idx])
+    print("num_filters : ", num_filters)
+    fig_size = int(np.ceil(np.sqrt(num_filters)))
+    print("fig_size : " , fig_size)
+
+    if(num_filters == 1):
+        img = visualize_activation(model, layer_idx, filter_indices = 0)        
+        plt.imshow(img)
+        return
+        
+    fig, ax = plt.subplots(fig_size, fig_size, figsize=(20, 20))
+    for i in range(num_filters):
+        img = visualize_activation(model, layer_idx, filter_indices = i)
+        ax[int(i/fig_size), (i%fig_size)].imshow(img)
+
+
+
