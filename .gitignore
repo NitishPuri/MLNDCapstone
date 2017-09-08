@@ -1,6 +1,7 @@
-input/train/*
-input/test/*
-input/train_masks/*
-input/zip/*
+input/train
+input/test
+input/train_masks
+input/zip
 input/*.csv
 ref/
+*.pyc
