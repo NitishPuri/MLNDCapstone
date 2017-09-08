@@ -55,7 +55,8 @@ The final score can be calculated as the mean of the Dice coefficients for each 
 We can convert this to a loss function by using    
 `dice_loss = 1 - QS`   
 
-This can be augmented with `binary_crossenntropy`
+This can be augmented with `binary_crossenntropy` to calculate a more robust loss function.   
+
 
 ## II. Analysis
 _(approx. 2-4 pages)_
@@ -130,7 +131,23 @@ where, `INPUT_SIZE = 128` while training for the benchmark. And, the model summa
 Here are the results obtained after *20 epochs* of the above model.
 ![alt](images/benchmarkPlot.png)   
 
+Training for this model is done without using any of the augmenting functions discussed later in preprocessing step. This model took ~5 min per epoch on NVidia GTX 960M with 2GB Memory.
+Here are some predictions visualized from the network(*Input, Softmax prediction, Prediction>0.001*).
+![alt](images/baselinePred1.png)
+![alt](images/baselinePred2.png)
+
+
+<!-- Here we can see, that although -->
+
 **Predictions using the benchmark,..!!!**
+
+#### Another Benchmark
+We can also use a second benchmark, not based on an ML based model. Here we take samples from the training set and calculate an average mask from the corresponding masks. Now this average mask can be used as a predicted mask for each test data. This benchmark is taken directly from a kaggle [post](https://www.kaggle.com/zfturbo/baseline-optimal-mask/code).
+
+Here is the average mask created as a benchmark,   
+![alt](images/avg_mask.jpg)
+
+This mask gets a score of `0.7491` on the Kaggle public leaderboard.
 
 
 ## III. Methodology
