@@ -47,7 +47,7 @@ def save_activations(model, model_inputs):
     batch_size = activation_maps[0].shape[0]
     assert batch_size == 1, 'One image at a time to visualize.'
 
-    # activation_maps = activation_maps[0:5]
+        # activation_maps = activation_maps[0:5]
 
     for layer_num, activation_map in enumerate(activation_maps):
         layer_name = model.layers[layer_num].name
@@ -57,22 +57,20 @@ def save_activations(model, model_inputs):
         num_filters = shape[3]
         fig_size = int(np.ceil(np.sqrt(num_filters)))
 
+        fig, ax = plt.subplots(fig_size, fig_size, figsize=(20, 20))
+        fig.suptitle('{} {}'.format(layer_num, layer_name))
+
         if(num_filters == 1):
             img = activation_map[:,:,0]
-            fig, ax = plt.subplots(1, 1, figsize=(20, 20))
-            fig.suptitle('{} {}'.format(layer_num, layer_name))
             ax.imshow(img)
-            fig.savefig('img/unet_128_{}_{}.png'.format(i, layer_name), dpi=fig.dpi)
-            plt.close(fig)
         else:        
-            fig, ax = plt.subplots(fig_size, fig_size, figsize=(20, 20))
-            fig.suptitle('{} {}'.format(layer_num, layer_name))
             for i in range(num_filters):
                 img = activation_map[:,:,i]
-                # ax[int(i/fig_size), (i%fig_size)].plot(img)
                 ax[int(i/fig_size), (i%fig_size)].imshow(img)
-            fig.savefig('img/unet_128_{}_{}.png'.format(layer_num, layer_name), dpi=fig.dpi)
-            plt.close(fig)
+        
+        fig.savefig('img/unet_128_{}_{}.png'.format(layer_num, layer_name), dpi=fig.dpi)
+        plt.close(fig)
+
 
 
 def display_activations(activation_maps):
