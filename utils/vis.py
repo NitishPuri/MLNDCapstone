@@ -126,7 +126,7 @@ def plot_baseline_stats():
     # pd.DataFrame(baseline_history.history)[['acc', 'val_acc']].plot()
     baseline_history_DF[['loss', 'val_loss']].plot(ax = axes[1])
 
-def vis_baseline_predictions(baseline_model):
+def vis_predictions(model, fullRes=False):
     nrows = 3
     f, ax = plt.subplots(nrows = nrows, ncols = 3, sharex = True, sharey = True, figsize=(20,20))
     # print(ax.__class__)
@@ -143,8 +143,11 @@ def vis_baseline_predictions(baseline_model):
         x_batch = []
         x_batch.append(image)
         x_batch = np.array(x_batch, np.float32) /255
-        pred = baseline_model.predict(x_batch).squeeze()
+        pred = model.predict(x_batch).squeeze()
 
+        if fullRes is True:
+            image = read_image(car_code, angle_code)
+            pred = cv2.resize(pred, (image.shape[1], image.shape[0]))
         # print(image.__class__)
         # print(ax.__class__)
         ax[i, 0].imshow(image)
