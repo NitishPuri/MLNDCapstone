@@ -1,5 +1,13 @@
+from sklearn.model_selection import train_test_split
+
 from utils.filename import *
 from utils.image import *
+from utils.data import *
+from utils.params import *
+from utils.preprocess import *
+
+train_masks = read_train_masks()
+train_images, validation_images = train_test_split(train_masks['img'], train_size = 0.8, random_state = 42)
 
 def train_manufacturer_gen():
     while True:
@@ -45,7 +53,6 @@ def train_generator():
                 
             x_batch = np.array(x_batch, np.float32) / 255
             y_batch = np.array(y_batch, np.float32) / 255
-            
             yield x_batch, y_batch
                  
 def valid_generator():
