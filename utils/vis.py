@@ -164,16 +164,29 @@ def vis_activation_maximizations(model, layer_idx):
     print("num_filters : ", num_filters)
     fig_size = int(np.ceil(np.sqrt(num_filters)))
     print("fig_size : " , fig_size)
+    layer_name = model.layers[layer_idx].name
+
+    fig, ax = plt.subplots(fig_size, fig_size, figsize=(20, 20))
+    fig.suptitle('{} {}'.format(layer_idx, layer_name))
 
     if(num_filters == 1):
         img = visualize_activation(model, layer_idx, filter_indices = 0)        
-        plt.imshow(img)
-        return
-        
-    fig, ax = plt.subplots(fig_size, fig_size, figsize=(20, 20))
-    for i in range(num_filters):
-        img = visualize_activation(model, layer_idx, filter_indices = i)
-        ax[int(i/fig_size), (i%fig_size)].imshow(img)
+        # plt.imshow(img)
+        ax.imshow(img)
+    else:        
+        for i in range(num_filters):
+            img = visualize_activation(model, layer_idx, filter_indices = i)
+            ax[int(i/fig_size), (i%fig_size)].imshow(img)
+    
+    fig.savefig('img_act/unet_128_{}_{}_act.png'.format(layer_idx, layer_name), dpi = fig.dpi)
+    plt.close(fig)
+
+
+def vis_all_activations(model):
+    layers = model.layers
+    for i, layer in enumerate(layers):
+        print("Visualizing layer {}({}) activations".format(i, layer.name))
+        vis_activation_maximizations(model, i)
 
 
 
