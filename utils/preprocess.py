@@ -1,12 +1,9 @@
 # %load utils/preprocess.py
 import numpy as np
 from scipy import ndimage
-from matplotlib import pyplot as plt
-import seaborn as sns
+# from matplotlib import pyplot as plt
+# import seaborn as sns
 import cv2
-from keras.preprocessing import image as kimage
-
-from utils.params import *
 
 def randomHueSaturationVariation(image, hue_shift_limit =(-180, 180), sat_shift_limit = (-255, 255),
                                  val_shift_limit = (-255, 255), u = 0.5 ):
@@ -67,19 +64,4 @@ def randomHorizontalFlip(image, mask, u=0.5):
         image = cv2.flip(image, 1)
         mask = cv2.flip(mask, 1)
 
-    return image, mask
-
-def randomCrop(image, mask, u = 0.5):
-    if np.random.random() < u:
-        height, width, channel = image.shape
-        cropL = int(np.random.uniform(0, width/50))
-        cropR = int(np.random.uniform(0, width/50))
-        cropT = int(np.random.uniform(0, width/50))
-        cropB = int(np.random.uniform(0, width/50))
-        image = image[cropT:height-cropB, cropL:width - cropR]
-        image = resize(image)
-        
-        mask = mask[cropT:height-cropB, cropL:width - cropR]
-        mask = resize(mask)
-        
     return image, mask
