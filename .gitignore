@@ -4,4 +4,19 @@ input/train_masks
 input/zip
 input/*.csv
 ref/
+
+
+
+# Temporary/generated/setting files.
+.ipynb_checkpoints
+.vscode
+events.out.*
 *.pyc
+
+# Temporary exlusions
+*.pdf
+images/img
+images/img_act
+input/exp
+*.hdf5
+subm/
