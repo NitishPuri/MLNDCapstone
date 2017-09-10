@@ -124,42 +124,48 @@ baseline_model.add( Conv2D(1, kernel_size=(5, 5), activation='sigmoid', padding=
 
 baseline_model.compile(Adam(lr=1e-3), bce_dice_loss, metrics=['accuracy', dice_coef])
 ```
-
 where, `INPUT_SIZE = 128` while training for the benchmark. And, the model summary,   
 ![alt](images/benchmarkSummary.png)   
 
-Here are the results obtained after *20 epochs* of the above model.
-![alt](images/benchmarkPlot.png)   
-
-Training for this model is done without using any of the augmenting functions discussed later in preprocessing step. This model took ~5 min per epoch on NVidia GTX 960M with 2GB Memory.
-Here are some predictions visualized from the network(*Input, Softmax prediction, Prediction>0.001*).
-![alt](images/baselinePred1.png)
-![alt](images/baselinePred2.png)
-
-
-<!-- Here we can see, that although -->
-
-**Predictions using the benchmark,..!!!**
-
+However, before discussing further about this benchmark, I would like to show another *simple* benchmark model.
 #### Another Benchmark
 We can also use a second benchmark, not based on an ML based model. Here we take samples from the training set and calculate an average mask from the corresponding masks. Now this average mask can be used as a predicted mask for each test data. This benchmark is taken directly from a kaggle [post](https://www.kaggle.com/zfturbo/baseline-optimal-mask/code).
 
 Here is the average mask created as a benchmark,   
 ![alt](images/avg_mask.jpg)
 
-This mask gets a score of `0.7491` on the Kaggle public leaderboard.
+This mask gets a score of **0.7491** on the Kaggle public leaderboard.
 
+#### Coming back to our benchmark model
+Here are the results obtained after *20 epochs* of the above model.
+![alt](images/benchmarkPlot.png)   
+
+Training for this model is done without using any of the augmenting functions discussed later in preprocessing step. This model took ~5 min per epoch on NVidia GTX 960M with 2GB Memory.
+The model received a public score of **0.8848** on Kaggle.
+Here are some predictions visualized from the network(*Input, Softmax prediction, Prediction>0.001*).
+![alt](images/baselinePred1.png)
+![alt](images/baselinePred2.png)
+
+Here, we can see that even this simple 3 layer model is able to detect a general shape of the automobile. Also, this simple model shows a significant improvement over the previous benchmark score of **0.7491**. This proves that using CNN's can be fruitful for the problem at hand.   
 
 ## III. Methodology
-_(approx. 3-5 pages)_
 
-### Data Preprocessing
-In this section, all of your preprocessing steps will need to be clearly documented, if any were necessary. From the previous section, any of the abnormalities or characteristics that you identified about the dataset will be addressed and corrected here. Questions to ask yourself when writing this section:
-- _If the algorithms chosen require preprocessing steps like feature selection or feature transformations, have they been properly documented?_
-- _Based on the **Data Exploration** section, if there were abnormalities or characteristics that needed to be addressed, have they been properly corrected?_
-- _If no preprocessing is needed, has it been made clear why?_
+### Data Preprocessing   
+
+The training data comes in the form of `1918X1280 RGB` images. Our U-Net model is composed of Fully Convolutional layers, which expect the input data in the form of 3D Matrices(multiple 2D stacked layers).So, there is no necessity for preprocessing the data for the model to start learning.   
+However, we need to consider other problems like computational complexity and overfitting.   
+* Convolution networks can be very compute intensive, and running through the full res input images would take a lot of time to converge. So, we start with a low res input `(128X128)` to see if it offers any improvement over the baseline models.
+* To help prevent large updates and variations in our gradients, we generally use data with zero mean and unit variance. Here, we have decided to not use that approach as our first step and start with a crude approximation to just normalize the input imagery so that its range is now between `(0, 1)`.
+* We have `5088` samples in our training data and `100064` samples in the test set. This shows that the training set *might* not be able to provide a good range of variations in the inputs. We can try to overcome this issue by augmenting our training data using random shifts. 
+    * Randomly shift pixel values in HSV space. This is done to add variations in the image in the form of tint and brightness. Using HSV space for this is generally better because it is more uniform i.e. less noisy w.r.t. local changes, and also slight shifts in HSV space might look more *natural* than similar shifts in RGB space.
+    * Randomly scale and rotate the input image while preserving the input dimensions. This would also help us make our model invariant changes in the scale(or distance from camera) of vehicle. We need to make sure that we don't use very large values which might cause the automobile to get cropped or change the orientation drastically.
+    * We introduce a random horizontal flip to the inputs.
+    Here are some samples produced after augmentation.   
+    ![alt](images/augment1.png)   
+    ![alt](images/augment2.png)   
 
 ### Implementation
+
 In this section, the process for which metrics, algorithms, and techniques that you implemented for the given data will need to be clearly documented. It should be abundantly clear how the implementation was carried out, and discussion should be made regarding any complications that occurred during this process. Questions to ask yourself when writing this section:
 - _Is it made clear how the algorithms and techniques were implemented with the given datasets or input data?_
 - _Were there any complications with the original metrics or techniques that required changing prior to acquiring a solution?_
