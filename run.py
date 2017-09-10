@@ -1,16 +1,37 @@
 import os
+
+import cv2
+import matplotlib.pyplot as plt
+from keras.utils import plot_model
+
+import utils.models as models
 import utils.vis as visutils
 
+mainOptions = {
+    "help" : ("Welcome to MLND Capstone : Image Automasking implementation\n"
+              "[1]. Exploration : Visualize data\n"
+              "[2]. U-Net Model Analysis\n"
+              "[3]. Baseline 1(Using Avg Mask)\n"
+              "[4]. Baseline 2(Simple 3 layer CNN)\n"
+              "[5]. Maker Model(Experimental)\n"
+              "[6]. Exit" ),
+    1 : lambda : setCurrMenu(exploreOptions),
+    2 : lambda : setCurrMenu(uNetOptions),
+    3 : lambda : setCurrMenu(baseline1_avgMask_options),
+    4 : lambda : setCurrMenu(baseline2_simpleCNN_options),
+    5 : lambda : setCurrMenu(uNetOptions),
+    6 : exit
+}
 
 exploreOptions = {
     "help" : ("Exploring data..\n"
-              "1. Explore raw data(without input masks)\n" 
-              "2. Explore raw data(with input masks)\n"
-              "3. Explore examples of incorrectly labeled data(with input masks)\n"
-              "4. Explore examples of augmented image samples(with input masks)\n"
-              "5. Explore examples of augmented image samples(without input masks)\n"
-              "6. Visualize Car maker distribution in the dataset.\n"
-              "7. Back to Main Menu\n"),
+              "[1]. Explore raw data(without input masks)\n" 
+              "[2]. Explore raw data(with input masks)\n"
+              "[3]. Explore examples of incorrectly labeled data(with input masks)\n"
+              "[4]. Explore examples of augmented image samples(with input masks)\n"
+              "[5]. Explore examples of augmented image samples(without input masks)\n"
+              "[6]. Visualize Car maker distribution in the dataset.\n"
+              "[7]. Back to Main Menu\n"),
 
     1 : lambda : visutils.vis_dataset(nrows = 3, ncols = 3, mask_alpha = 0.0, augment = False),
     2 : lambda : visutils.vis_dataset(nrows = 3, ncols = 3, mask_alpha = 0.4, augment = False),
@@ -21,33 +42,102 @@ exploreOptions = {
     7 : lambda : setCurrMenu(mainOptions)
 }
 
+uNetOptions = {
+    "help" : ("U-Net Model..\n"
+              "[1].  Model Summary\n" 
+              "[2].  Train model\n"
+              "[3].  Plot training summary\n"
+              "[4].  Visualize sample predictions\n"
+              "[5].  Create submission.\n"
+              "[6].  Visualize layer activations.\n"
+              "[7].  Visualize filters(using activation maximization).\n"
+              "[8].  Visualize predictions on external images(car, experimental).\n"
+              "[9]. Visualize predictions on external images(notCar, experimental).\n"
+              "[10]. Back to Main menu.\n"),
 
-# def unet_analysis:
-#     pass
+    1  : lambda : show_uNet_summary() ,
+    2  : lambda : visutils.vis_curropted_dataset(),
+    3  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.4, augment = True),
+    4  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.0, augment = True),
+    5  : lambda : visutils.vis_manufacturer_distribution(),
+    6  : lambda : setCurrMenu(mainOptions),
+    7  : lambda : setCurrMenu(mainOptions),
+    8  : lambda : setCurrMenu(mainOptions),
+    9 : lambda : setCurrMenu(mainOptions),
+    10 : lambda : setCurrMenu(mainOptions)
+}
 
-# def baseline_avg_mask:
-#     pass
+def show_uNet_summary():
+    models.get_unet_128().summary()
+    input("Press Enter to continue...")
 
-# def baseline_simple_cnn:
-#     pass
+def show_UNet_graph():   
 
-# def maker_model_analysis:
-#     pass    
+    # plot_model(models.get_unet_128(), to_file="unet_128_graph.png")
+    img = cv2.imread("unet_128_graph.png") 
+    plt.imshow(img)
+    # cv2.namedWindow('Unet', cv2.WINDOW_NORMAL)
+    # cv2.imshow('Unet', img)
+    cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
-mainOptions = {
-    "help" : ("Welcome to MLND Capstone : Image Automasking implementation\n"
-              "1. Exploration : Visualize data\n"
-              "2. U-Net 128\n"
-              "3. Baseline 1(Using Avg Mask)\n"
-              "4. Baseline 2(Simple 3 layer CNN)\n"
-              "5. Maker Model(Experimental)\n"
-              "6. Exit" ),
-    1 : lambda : setCurrMenu(exploreOptions),
-    # 2 : unet_analysis,
-    # 3 : baseline_avg_mask,
-    # 4 : baseline_simple_cnn,
-    # 5 : maker_model_analysis,
-    6 : exit
+baseline1_avgMask_options = {
+    "help" : ("Baseline 1(Using Avg Mask)\n"
+              "[1]. View Avg Mask(create if not available)\n" 
+              "[2]. Create Submission\n"
+              "[3]. Score on training set.\n"
+              "[4]. Back to Main menu.\n" ),
+
+    1  : lambda : visutils.vis_dataset(nrows = 3, ncols = 3, mask_alpha = 0.0, augment = False),
+    2  : lambda : visutils.vis_dataset(nrows = 3, ncols = 3, mask_alpha = 0.4, augment = False),
+    3  : lambda : visutils.vis_curropted_dataset(),
+    4  : lambda : setCurrMenu(mainOptions)
+}
+
+baseline2_simpleCNN_options = {
+    "help" : ("Baseline 2 (Using Vanilla CNN)..\n"
+              "[1].  Model Summary\n" 
+              "[2].  Model Graph\n"
+              "[3].  Train model\n"
+              "[4].  Plot training summary\n"
+              "[5].  Visualize sample predictions\n"
+              "[6].  Create submission.\n"
+              "[7].  Visualize layer activations.\n"
+              "[8].  Visualize filters(using activation maximization).\n"
+              "[9].  Visualize predictions on external images(car, experimental).\n"
+              "[10]. Visualize predictions on external images(notCar, experimental).\n"
+              "[11]. Back to Main menu.\n"),
+
+    1  : lambda : visutils.vis_dataset(nrows = 3, ncols = 3, mask_alpha = 0.0, augment = False),
+    2  : lambda : visutils.vis_dataset(nrows = 3, ncols = 3, mask_alpha = 0.4, augment = False),
+    3  : lambda : visutils.vis_curropted_dataset(),
+    4  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.4, augment = True),
+    5  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.0, augment = True),
+    6  : lambda : visutils.vis_manufacturer_distribution(),
+    7  : lambda : setCurrMenu(mainOptions),
+    8  : lambda : setCurrMenu(mainOptions),
+    9  : lambda : setCurrMenu(mainOptions),
+    10 : lambda : setCurrMenu(mainOptions),
+    11 : lambda : setCurrMenu(mainOptions)
+}
+
+maker_model_options = {
+    "help" : ("Manufacturer Model (Guess the maker, experimental)..\n"
+              "[1].  Model Summary\n" 
+              "[2].  Model Graph\n"
+              "[3].  Train model\n"
+              "[4].  Plot training summary\n"
+              "[5].  Visualize sample predictions\n"
+              "[6].  Visualize layer activations.\n"
+              "[7]. Back to Main menu.\n"),
+
+    1  : lambda : visutils.vis_dataset(nrows = 3, ncols = 3, mask_alpha = 0.0, augment = False),
+    2  : lambda : visutils.vis_dataset(nrows = 3, ncols = 3, mask_alpha = 0.4, augment = False),
+    3  : lambda : visutils.vis_curropted_dataset(),
+    4  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.4, augment = True),
+    5  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.0, augment = True),
+    6  : lambda : visutils.vis_manufacturer_distribution(),
+    7  : lambda : setCurrMenu(mainOptions)
 }
 
 
