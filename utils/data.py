@@ -32,3 +32,7 @@ def list_test_files():
         List all test files from the `./input/test`
     """
     return os.listdir(TEST_DIR_PATH)
+
+
+def list_car_and_dog_images():
+    return ['./input/car_and_dog/' + file  for file in os.listdir('./input/car_and_dog')] 
