@@ -4,6 +4,8 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 from scipy import ndimage
+import scipy.misc
+from tqdm import tqdm
 
 import utils.data as data
 from utils.filename import *
@@ -106,6 +108,7 @@ def plot_baseline_stats():
     baseline_history_DF[['dice_coef', 'val_dice_coef']].plot(ax = axes[0]);
     # pd.DataFrame(baseline_history.history)[['acc', 'val_acc']].plot()
     baseline_history_DF[['loss', 'val_loss']].plot(ax = axes[1])
+    fig.show()
 
 def vis_predictions(model, fullRes=False):
     nrows = 3
@@ -115,27 +118,69 @@ def vis_predictions(model, fullRes=False):
 #     sampled_imgs = [TRAIN_PATH + '/' + i for i in sampled_imgs]
     
     counter = 0
+
     for i in range(nrows):
         # for j in range(ncols):
         car_code, angle_code = filename_to_code(sampled_imgs[counter])
         image = read_image(car_code, angle_code)
-        image = resize(image)
+        im = resize(image)
 
         x_batch = []
-        x_batch.append(image)
+        x_batch.append(im)
         x_batch = np.array(x_batch, np.float32) /255
         pred = model.predict(x_batch).squeeze()
 
         if fullRes is True:
-            image = read_image(car_code, angle_code)
+            im = image
             pred = cv2.resize(pred, (image.shape[1], image.shape[0]))
-        # print(image.__class__)
-        # print(ax.__class__)
+
         ax[i, 0].imshow(image)
         ax[i, 1].imshow(pred, cmap='gray')
-        ax[i, 2].imshow(pred > 0.001, cmap='gray')
+        ax[i, 2].imshow(pred > THRESHOLD, cmap='gray')
             
         counter += 1
+
+    plt.show()    
+
+def vis_predictions_ext(model, fullRes = False):
+    nrows = 3
+    f, ax = plt.subplots(nrows = nrows, ncols = 3, sharex = True, sharey = True, figsize=(20,20))
+
+    samples = data.list_car_and_dog_images()
+
+    sampled_imgs = np.random.choice(samples, nrows)
+    
+    for i in tqdm(range(len(sampled_imgs))):
+        sample = sampled_imgs[i]
+        image = ndimage.imread(sample)
+        # image = cv2.imread(sample)
+        try:
+
+            im = image[:,:,:3]
+
+            im = resize(im)
+            
+            x_batch = []
+            x_batch.append(im)
+            x_batch = np.array(x_batch, np.float32) /255
+            pred = model.predict(x_batch).squeeze()
+
+            if fullRes is True:
+                im = image
+                pred = cv2.resize(pred, (image.shape[1], image.shape[0]))
+
+            filename = sample[0:-4]
+
+            ax[i, 0].imshow(im, interpolation='nearest', aspect='auto')
+            ax[i, 1].imshow(pred, cmap='gray')
+            ax[i, 2].imshow(pred > THRESHOLD, cmap='gray')
+
+        except IndexError:
+            print("Issue with '{}'".format(sample))
+            print(ndimage.imread(sample).shape)
+        
+    # plt.tight_layout()
+
 
     plt.show()    
 
