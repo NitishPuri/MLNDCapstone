@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 import utils.data as data
 import utils.generator as gen
 import utils.models as models
+import utils.zf_baseline as zf_baseline 
 from utils.params import *
 
 train_masks = data.read_train_masks()
@@ -70,3 +71,10 @@ def trainUnet128Model():
                         validation_data=valid_generator(), callbacks = callbacks)
 
     return unet_model_history
+
+def score_baseline_val_score():
+    thr = 0.395     # Threshold calculated while generating mask image
+    score = zf_baseline.get_score(validation_images, avg_mask, thr)
+
+    print("Avg Mask Basline score on Validation Set : {:.6f}".format(score))
+    input("\nPress Enter to continue...")
