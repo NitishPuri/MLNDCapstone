@@ -6,6 +6,8 @@ from keras.utils import plot_model
 
 import utils.models as models
 import utils.vis as visutils
+import train
+import utils.zf_baseline as zf_baseline
 
 mainOptions = {
     "help" : ("Welcome to MLND Capstone : Image Automasking implementation\n"
@@ -56,7 +58,7 @@ uNetOptions = {
               "[10]. Back to Main menu.\n"),
 
     1  : lambda : show_uNet_summary() ,
-    2  : lambda : visutils.vis_curropted_dataset(),
+    2  : lambda : train.trainUnet128Model(),
     3  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.4, augment = True),
     4  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.0, augment = True),
     5  : lambda : visutils.vis_manufacturer_distribution(),
@@ -71,15 +73,6 @@ def show_uNet_summary():
     models.get_unet_128().summary()
     input("Press Enter to continue...")
 
-def show_UNet_graph():   
-
-    # plot_model(models.get_unet_128(), to_file="unet_128_graph.png")
-    img = cv2.imread("unet_128_graph.png") 
-    plt.imshow(img)
-    # cv2.namedWindow('Unet', cv2.WINDOW_NORMAL)
-    # cv2.imshow('Unet', img)
-    cv2.waitKey(0)
-    # cv2.destroyAllWindows()
 
 baseline1_avgMask_options = {
     "help" : ("Baseline 1(Using Avg Mask)\n"
@@ -88,11 +81,30 @@ baseline1_avgMask_options = {
               "[3]. Score on training set.\n"
               "[4]. Back to Main menu.\n" ),
 
-    1  : lambda : visutils.vis_dataset(nrows = 3, ncols = 3, mask_alpha = 0.0, augment = False),
-    2  : lambda : visutils.vis_dataset(nrows = 3, ncols = 3, mask_alpha = 0.4, augment = False),
+    1  : lambda : show_avg_mask(),
+    2  : lambda : create_avgMask_submission(),
     3  : lambda : visutils.vis_curropted_dataset(),
     4  : lambda : setCurrMenu(mainOptions)
 }
+
+def show_avg_mask():
+    img = cv2.imread('images/avg_mask.jpg')
+    if img is None:
+        print("Creating avg mask,..")
+        score, img  = zf_baseline.validation_get_optimal_thr()
+    
+    cv2.namedWindow('Avg Mask', cv2.WINDOW_NORMAL)
+    cv2.imshow('Avg Mask', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+def create_avgMask_submission():
+    img = cv2.imread('images/avg_mask.jpg')
+    if img is None:
+        print("Creating avg mask,..")
+        score, img  = zf_baseline.validation_get_optimal_thr()
+    zf_baseline.create_submission(img)
+
 
 baseline2_simpleCNN_options = {
     "help" : ("Baseline 2 (Using Vanilla CNN)..\n"
