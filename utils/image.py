@@ -6,6 +6,10 @@ import cv2
 from utils.params import *
 from utils.filename import get_filepath_from_code
 
+"""
+    Utilities to open and show image given car code and angle code.
+"""
+
 def read_image(car_code, angle_code, mask = False, test = False):
     img_path = get_filepath_from_code(car_code, angle_code, mask, test)
     img = None

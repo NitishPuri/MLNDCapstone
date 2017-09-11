@@ -12,6 +12,8 @@ from utils.preprocess import *
 
 train_masks = data.read_train_masks()
 
+""" Visualization utils"""
+
 def vis_dataset(nrows = 5, ncols = 5, mask_alpha = 0.4, augment = False):
     
     """ Sample some images from the dataset and show them in a grid."""

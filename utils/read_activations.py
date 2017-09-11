@@ -1,8 +1,10 @@
-### https://github.com/philipperemy/keras-visualize-activations/blob/master/read_activations.py
-
 
 import keras.backend as K
 
+"""
+Example taken from https://github.com/philipperemy/keras-visualize-activations/blob/master/read_activations.py
+Generate and display activations produced by the given input in the intermediate layers of the model.
+"""
 
 def get_activations(model, model_inputs, print_shape_only=False, layer_name=None):
     print('----- activations -----')

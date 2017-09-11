@@ -10,6 +10,10 @@ train_masks = read_train_masks()
 train_images, validation_images = train_test_split(train_masks['img'], train_size = 0.8, random_state = 42)
 
 def train_manufacturer_gen():
+    """
+        Generate training examples for manufacturer model.
+        This generates a pair (input image, manufacturer label)
+    """
     while True:
         img_filename = np.random.choice(train_images)        
         car_code, angle_code = filename_to_code(img_filename)
@@ -19,6 +23,10 @@ def train_manufacturer_gen():
         yield img.reshape(-1, INPUT_SIZE, INPUT_SIZE, 3), label.reshape(1, -1)
     
 def val_manufacturer_gen():
+    """
+        Generate validation examples for manufacturer model.
+        This generates a pair (input image, manufacturer label)
+    """
     while True:
         img_filename = np.random.choice(validation_images)        
         car_code, angle_code = filename_to_code(img_filename)
@@ -28,6 +36,11 @@ def val_manufacturer_gen():
         yield img.reshape(-1, INPUT_SIZE, INPUT_SIZE, 3), label.reshape(1, -1)
 
 def train_generator():
+    """
+        Generate training examples for segmentation model.
+        This generates a pair (input image, mask image)
+        We also augment the training data to provide more variance and reduce overfitting.
+    """
     while True:
         for start in range(0, len(train_images), BATCH_SIZE):
             x_batch = []
@@ -56,6 +69,10 @@ def train_generator():
             yield x_batch, y_batch
                  
 def valid_generator():
+    """
+        Generate validation examples for segmentation model.
+        This generates a pair (input image, mask image)
+    """
     while True:
         for start in range(0, len(validation_images), BATCH_SIZE):
             x_batch = []

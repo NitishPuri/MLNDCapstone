@@ -7,6 +7,9 @@ import cv2
 
 def randomHueSaturationVariation(image, hue_shift_limit =(-180, 180), sat_shift_limit = (-255, 255),
                                  val_shift_limit = (-255, 255), u = 0.5 ):
+    """
+        Randomly shift the image pixels in HSV space.
+    """
     if np.random.random() < u :
         image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h, s, v = cv2.split(image)
@@ -26,6 +29,9 @@ def randomShiftScaleRotate(image, mask,
                            scale_limit=(-0.1, 0.1),
                            rotate_limit=(-45, 45), aspect_limit=(0, 0),
                            borderMode=cv2.BORDER_REFLECT, u=0.5):
+    """
+        Randomly transform image scale and rotation along horizontal.
+    """
     if np.random.random() < u:
         height, width, channel = image.shape
 
@@ -60,6 +66,9 @@ def randomShiftScaleRotate(image, mask,
     return image, mask
 
 def randomHorizontalFlip(image, mask, u=0.5):
+    """
+        Randomly flip the input image
+    """
     if np.random.random() < u:
         image = cv2.flip(image, 1)
         mask = cv2.flip(mask, 1)

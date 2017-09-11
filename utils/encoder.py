@@ -4,8 +4,11 @@ import numpy as np
 from utils.filename import filename_to_code
 from utils.image import read_image
 
-# https://www.kaggle.com/stainsby/fast-tested-rle
 def rle_encode(mask_image):
+    """
+        Modified from : https://www.kaggle.com/stainsby/fast-tested-rle
+        Convert a mask image into a list of run lengths
+    """
     pixels = mask_image.flatten()
     # We avoid issues with '1' at the start or end (at the corners of 
     # the original image) by setting those pixels to '0' explicitly.
@@ -21,9 +24,15 @@ def rle_to_string(runs):
     return ' '.join(str(x) for x in runs)
 
 def run_length_encode(mask):
+    """
+        Convert a mask image into its run length encoding
+    """
     return rle_to_string(rle_encode(mask))
 
 def test_rle_encode(train_masks):
+    """
+        Modified from : https://www.kaggle.com/stainsby/fast-tested-rle
+    """
     test_mask = np.asarray([[0, 0, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1], [0, 0, 0, 0]])
     assert rle_to_string(rle_encode(test_mask)) == '7 2 11 2'
     num_masks = len(train_masks['img'])

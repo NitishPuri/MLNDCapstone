@@ -15,8 +15,7 @@ random.seed(2017)
 np.random.seed(2017)
 
 NUM_OF_IMAGES_FROM_TRAIN = 600
-INPUT_PATH = '../input/'
-OUTPUT_PATH = './'
+INPUT_PATH = './input/'
 
 
 def rle(img):
@@ -96,19 +95,19 @@ def validation_get_optimal_thr():
     avg_mask_thr[avg_mask_thr > 0.5] = 1
     avg_mask_thr[avg_mask_thr <= 0.5] = 0
     print(avg_mask.shape, avg_mask_thr.shape)
-    cv2.imwrite('avg_mask.jpg', (255*avg_mask_thr).astype(np.uint8))
+    cv2.imwrite('images/avg_mask.jpg', (255*avg_mask_thr).astype(np.uint8))
 
     return best_score, avg_mask_thr
 
 
-def create_submission(best_score, avg_mask):
+def create_submission(avg_mask):
     print('Create submission...')
     t = pd.read_csv(INPUT_PATH + 'sample_submission.csv')
     str = rle(avg_mask)
     t['rle_mask'] = str
-    t.to_csv('subm_{}.gz'.format(best_score), index=False, compression='gzip')
+    t.to_csv('subm/subm_avgmask.gz', index=False, compression='gzip')
 
 
 if __name__ == '__main__':
     best_score, avg_mask = validation_get_optimal_thr()
-    create_submission(best_score, avg_mask)
+    create_submission(avg_mask)

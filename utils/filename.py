@@ -1,5 +1,9 @@
 from utils.params import *
 
+"""
+    Filename conversion utilities.
+"""
+
 def filename_to_code(filename):
     car_code, angle_code = filename.split('.')[0].split('_')
     return car_code, angle_code

@@ -1,3 +1,8 @@
+
+"""
+    Some global parameters and constants used throughout different files and utilities.
+"""
+
 PROJECT_PATH = '.'
 INPUT_PATH = PROJECT_PATH + '/input'
 

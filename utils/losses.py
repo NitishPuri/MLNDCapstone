@@ -5,11 +5,9 @@ from keras.losses import binary_crossentropy
 # Evaluation Metric: Dice Coefficient
 # Given two vector x and y, returns their dice distance
 
-laplace_smoothing = 1
-
-def test(self):
-    print("helloooo")
-    pass
+"""
+    Accuracy and loss functions for segmentation model. Defines Dice accuracy and loss function.
+"""
 
 def dice(x, y):
     return 2*(len(set(x).intersection(set(y))))/(len(set(x)) + len(set(y)))    
@@ -41,9 +39,3 @@ def dice_loss(y_true, y_pred):
 
 def bce_dice_loss(y_true, y_pred):
     return binary_crossentropy(y_true, y_pred) + dice_loss(y_true, y_pred)
-
-def get_score(train_masks, avg_mask, thr):
-    d = 0.0
-    for i in range(train_masks.shape[0]):
-        d += dice_coeff(train_masks[i], avg_mask)
-    return d/train_masks.shape[0]
