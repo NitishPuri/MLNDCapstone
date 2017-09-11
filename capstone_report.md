@@ -90,6 +90,16 @@ These results show the distribution in train and test sets.
 **Test data**
 ![alt](images/test_metadata.png)
 
+As a *side quest* I decided to train a very crude model that can predict car manufacturer given a car image. Here is the model summary,   
+![alt](images/man_summary.png)   
+
+We use `categorical_crossentropy` loss and optimize this model using `Adam`.
+
+Here is the learning graph for the model.   
+![alt](images/man_plot.png)   
+
+This model can also be improved by using data augmentation methods used in the following sections.
+
 #### Corrupt data   
 during random visualization of the dataset i was able to find out a few samples that do not have a (nearly)perfect mask. These anomalies are mostly because of very thin apendages such as spoilers or antennas, regular patterns such as wheel spokes or translucent features such as glasses. These samples may cause issues, and we can try to improve the score by removing these samples from the train dataset. However, I have decided to not remove these samples and rely on data augmentation to provide regularization effects against these samples.   
 ![alt](images/curroptedF.png)   
@@ -166,39 +176,69 @@ However, we need to consider other problems like computational complexity and ov
 
 ### Implementation
 
-In this section, the process for which metrics, algorithms, and techniques that you implemented for the given data will need to be clearly documented. It should be abundantly clear how the implementation was carried out, and discussion should be made regarding any complications that occurred during this process. Questions to ask yourself when writing this section:
-- _Is it made clear how the algorithms and techniques were implemented with the given datasets or input data?_
-- _Were there any complications with the original metrics or techniques that required changing prior to acquiring a solution?_
-- _Was there any part of the coding process (e.g., writing complicated functions) that should be documented?_
+The project is implemented in `python 3` using `Keras` for building and training neural network and `OpenCV` for image processing. Different parts of the project are divided into modules in the form of `.py` files. These are explained below,
+* `data.py` : Utility for reading in csv files for metadata, train masks and listing testing and training datasets.
+* `encoder.py` : Utility for converting image mask to *run length encoding*.
+* `filename.py` : Utility for getting car id and angle id from filename and vice versa.
+* `generator.py` : Generator functions used while training the network.
+* `image.py` : Utilities to open and show image given car code and angle code.
+* `losses.py` : Accuracy and loss functions for segmentation model. Defines Dice accuracy and loss function.
+* `models.py` : Functions to generate the UNet model, baseline model and manufacturer model.
+* `params.py` : Some global parameters and constants used throughout different files and utilities.
+* `preprocess.py` : Functions to add random variations to a given image for data augmentation.
+* `read_activations.py` : Generate and display activations produced by the given input in the intermediate layers of the model.
+* `vis.py` : Provides various visualization utils for data exploration, plotting results and visualizing model filters.
+* `zf_baseline.py` : File taken from a Kaggle kernel to produce avg baseline mask. 
 
-### Refinement
-In this section, you will need to discuss the process of improvement you made upon the algorithms and techniques you used in your implementation. For example, adjusting parameters for certain models to acquire improved solutions would fall under the refinement category. Your initial and final solutions should be reported, as well as any significant intermediate results as necessary. Questions to ask yourself when writing this section:
-- _Has an initial solution been found and clearly reported?_
-- _Is the process of improvement clearly documented, such as what techniques were used?_
-- _Are intermediate and final solutions clearly reported as the process is improved?_
+The project is initially implemented in *Jupyter Notebooks* for exploration and then plugged into a console program using `run.py`.
+
+#### Metrics
+As previously discussed, we are using `dice coefficient` as our metric for accuracy. This is converted to a loss function by using `dice_loss = 1 - dice_coeff`. 
+
+#### Model Architecture
+For our final model implementation we are going to use a UNet based model as discussed previously. The model is defined in `models.py`. Here is a high level illustration for the model,   
+This is a simple **Conv block** consisting of a single convolution layer followed by a batch normalization layer and a relu activation layer.    
+![alt](images/conv_block.png)   
+
+These conv blocks can be chained together to form *double* or *triple* convolution blocks which I am using in the following illustration.   
+![alt](images/uNet_128.png)   
+
+The UNet architecture is composed of `encode-decode` architecture along with `concatenation` from the previous high res layers. The last layer of the model is a `(1 X 1)` convolution followed by a `sigmoid` activation function. We train this model using `RMSprop` with an initial learning rate of `0.0001`. 
+
+The initial model that I implemented consisted of deeper layers with `1024` filters. However my GPU was not able to handle that kind of memory even with a batch size of `8`. So, I decided to use remove those layers from in between and use a center layer of `512` filters instead, with `16` samples per batch.   
+Further, I added the following callbacks to the fit function to monitor the learning process,
+* `ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=4, verbose=1, epsilon=1e-4)` : This reduces the learning rate by a factor of `0.1` if `val_loss` does not improve by more than `1e-4` for `4`
+ iterations.
+ * `EarlyStopping(monitor='val_loss', patience=8, verbose=1, min_delta=1e-4)` : This callback stops the learning process if `val_loss` does not improve by `1e-4` for `8` consecutive iterations.
+
+ Using this configuration, I was able to achieve the following learning graph.   
+![alt](images/unet128_plot.png)   
+
+Here we can clearly see that the model did not improve much after the first `4` epochs, and stopped after `20` epochs. 
 
 
 ## IV. Results
-_(approx. 2-3 pages)_
 
 ### Model Evaluation and Validation
-In this section, the final model and any supporting qualities should be evaluated in detail. It should be clear how the final model was derived and why this model was chosen. In addition, some type of analysis should be used to validate the robustness of this model and its solution, such as manipulating the input data or environment to see how the model’s solution is affected (this is called sensitivity analysis). Questions to ask yourself when writing this section:
-- _Is the final model reasonable and aligning with solution expectations? Are the final parameters of the model appropriate?_
-- _Has the final model been tested with various inputs to evaluate whether the model generalizes well to unseen data?_
-- _Is the model robust enough for the problem? Do small perturbations (changes) in training data or the input space greatly affect the results?_
-- _Can results found from the model be trusted?_
+Since this is a Kaggle competition, the test data that we have is not labeled, i.e. we don't have correct output masks available for the test dataset. So, for evaluating our model we can either remove some data from the training set and keep aside for testing(before the train-validation split). However, I decided to use the score provided by Kaggle public leaderboard for model evaluation. To do this, I needed to predict the masks for each of the images available in the test set(`/input/test`), and convert them to rle encoding for submission. This model achieves a score of **0.9886** on the public leaderboard.    
+Masks generated by our final model.   
+*Original Image, Sigmoid Prediction, Prediction with threshold(0.0001)*
+![alt](images/unet128_pred_highres.png)   
 
-### Justification
-In this section, your model’s final solution and its results should be compared to the benchmark you established earlier in the project using some type of statistical analysis. You should also justify whether these results and the solution are significant enough to have solved the problem posed in the project. Questions to ask yourself when writing this section:
-- _Are the final results found stronger than the benchmark result reported earlier?_
-- _Have you thoroughly analyzed and discussed the final solution?_
-- _Is the final solution significant enough to have solved the problem?_
+The masks produced by our final model look reasonable to the naked eye, and they are a huge improvement over our last result using a simple 3 layer CNN model.   
+
+Further, we can also validate how good our model is in generating masks for different *kind* of images that it has never seen before. This is not a part of the kaggle challenge and hence the input images are just some freely available stock images taken from [here](!slhslj)
+
+
 
 
 ## V. Conclusion
-_(approx. 1-2 pages)_
 
 ### Free-Form Visualization
+One of the major issues with Neural networks is that of reasonability, i.e. given the model architecture and weights it is very difficult to readon *why* the model behaves the way it does. Some of these issues can be addressed by visualizing the intermediate layer activations for a given input.   
+In this section we provide some of the intermediate layer activations for the baseline model and our final unet model.   
+
+
 In this section, you will need to provide some form of visualization that emphasizes an important quality about the project. It is much more free-form, but should reasonably support a significant result or characteristic about the problem that you want to discuss. Questions to ask yourself when writing this section:
 - _Have you visualized a relevant or important quality about the problem, dataset, input data, or results?_
 - _Is the visualization thoroughly analyzed and discussed?_
