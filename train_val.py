@@ -11,6 +11,8 @@ import utils.generator as gen
 import utils.losses as losses
 import utils.models as models
 import utils.zf_baseline as zf_baseline
+import utils.vis as visutils
+import utils.encoder as encoder
 from utils.filename import *
 from utils.image import *
 from utils.params import *
@@ -41,7 +43,7 @@ def show_manufacturerModel_summary():
     input("Press Enter to continue...")
 
 
-""" Basic Basline Model """
+""" 3 layer Basline Model """
 
 def trainBaselineModel():
     baseline_model = models.get_baseline_model()
@@ -70,27 +72,106 @@ def show_baseline_2_summary():
     models.get_baseline_model().summary()
     input("Press Enter to continue...")
 
+def vis_baseline_predictions():
+    baseline_model = models.get_baseline_model()
+    baseline_model.load_weights('models/baseline_model.best_weights.hdf5')
+    visutils.vis_predictions(baseline_model, fullRes = True) 
+
+
+def score_baseline_val():
+    baseline_model = models.get_baseline_model()
+    baseline_model.load_weights('models/baseline_model.best_weights.hdf5')
+
+    num_val_samples = 600
+    val_batch = validation_images[0:num_val_samples]
+
+    score = 0.0
+
+    print("Calculating score over {} validation images.".format(num_val_samples))
+
+    # Should use batches for predicting if this seems slow.
+    for val_img in tqdm(val_batch):
+        car_code, angle_code = filename_to_code(val_img)
+        image = read_image(car_code, angle_code)
+        im = resize(image)
+        mask = read_image(car_code, angle_code, mask=True)
+
+        x_batch = []
+        x_batch.append(im)
+        x_batch = np.array(x_batch, np.float32) /255
+        
+        prediction = baseline_model.predict(x_batch).squeeze()
+        prediction = cv2.resize(prediction, (image.shape[1], image.shape[0]))
+        prediction = (prediction > THRESHOLD)
+        score += losses.dice_coeff_numpy(mask, prediction)
+
+    score = score/num_val_samples
+
+    print("Simple Baseline score on Validation Set : {:.6f}".format(score))
+    input("\nPress Enter to continue...")
+
+def create_baseline_submission():
+    baseline_model = models.get_baseline_model()
+    baseline_model.load_weights('models/baseline_model.best_weights.hdf5')
+    rles = []
+    orig_width = 1918
+    orig_height = 1280
+    ids_test = data.list_test_files()
+    print('Predicting on {} samples with batch_size = {}...'.format(len(ids_test), BATCH_SIZE))
+    for start in tqdm(range(0, len(ids_test), BATCH_SIZE)):
+        x_batch = []
+        end = min(start + BATCH_SIZE, len(ids_test))
+        ids_test_batch = ids_test[start:end]
+        for id in ids_test_batch:
+            car_code, angle_code = filename_to_code(id)
+            img = read_image(car_code, angle_code, test = True)
+            img = resize(img)
+            x_batch.append(img)
+        x_batch = np.array(x_batch, np.float32) / 255
+        preds = baseline_model.predict_on_batch(x_batch)
+        preds = np.squeeze(preds, axis = 3)
+        for pred in preds:
+            prob = cv2.resize(pred, (orig_width, orig_height))
+            mask = prob > THRESHOLD
+            rle = encoder.run_length_encode(mask)
+            rles.append(rle)
+
+    print("Generating submission file,..")
+
+    filename = 'submit/baseline_001.csv.gz'
+    df = pd.DataFrame({'img':names, 'rle_mask':rles})
+    df.to_csv(filename, index = False, compression='gzip')
+
+    print("Generated submission file,.. {}".format(filename))
+    input("Press any key to continue...")
+
+def vis_predictions_baseline_external():
+    baseline_model = models.get_baseline_model()
+    baseline_model.name = 'baseline'
+    baseline_model.load_weights('models/baseline_model.best_weights.hdf5')
+    visutils.vis_predictions_ext(baseline_model, data.list_car_and_dog_images())
+
 """ Avg Mask Baseline Model"""
 
-def score_baseline_val_score():
+def score_avg_baseline_val_score():
     num_val_samples = 600
     val_batch = validation_images[0:num_val_samples]                 
 
     avg_mask = cv2.imread('images/avg_mask.jpg', cv2.IMREAD_GRAYSCALE)
 
-    d = 0.0
+    score = 0.0
     
     print("Calculating score over {} validation images.".format(num_val_samples))
 
     for val_img in tqdm(val_batch):
         car_code, angle_code = filename_to_code(val_img)
         mask = read_image(car_code, angle_code, mask=True)
-        d += losses.dice_coeff_numpy(mask, avg_mask)
+        score += losses.dice_coeff_numpy(mask, avg_mask)
         # d += losses.dice_coeff(mask, avg_mask)
 
-    d = d/num_val_samples
+    score = score/num_val_samples
 
-    print("Avg Mask Basline score on Validation Set : {:.6f}".format(d))
+    print("Avg Mask Basline score on Validation Set : {:.6f}".format(score))
     input("\nPress Enter to continue...")
 
 def show_avg_mask():
