@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 __author__ = 'ZFTurbo: https://kaggle.com/zfturbo'
 
-import numpy as np
+import glob
 import gzip
 import os
-import glob
-import time
-import cv2
-import pandas as pd
 import random
+import time
+
+import cv2
+import numpy as np
+import pandas as pd
 from PIL import Image
 
 random.seed(2017)

@@ -1,12 +1,7 @@
 import os
 
-import cv2
-import matplotlib.pyplot as plt
-from keras.utils import plot_model
-
-import utils.vis as visutils
 import train_val
-import utils.zf_baseline as zf_baseline
+import utils.vis as visutils
 
 mainOptions = {
     "help" : ("Welcome to MLND Capstone : Image Automasking implementation\n"
@@ -97,7 +92,7 @@ baseline2_simpleCNN_options = {
 
     1  : lambda : train_val.show_baseline_2_summary(),
     2  : lambda : train_val.trainBaselineModel(),
-    # 3  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.4, augment = True),
+    3  : lambda : visutils.plot_baseline_stats(),
     # 4  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.0, augment = True),
     # 5  : lambda : visutils.vis_manufacturer_distribution(),
     # 6  : lambda : setCurrMenu(mainOptions),

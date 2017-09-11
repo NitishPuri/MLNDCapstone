@@ -1,8 +1,8 @@
 from sklearn.model_selection import train_test_split
 
+from utils.data import *
 from utils.filename import *
 from utils.image import *
-from utils.data import *
 from utils.params import *
 from utils.preprocess import *
 

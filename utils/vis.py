@@ -1,13 +1,14 @@
 import cv2
 import numpy as np
+import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 from scipy import ndimage
 
 import utils.data as data
 from utils.filename import *
-from utils.params import *
 from utils.image import *
+from utils.params import *
 from utils.preprocess import *
 
 train_masks = data.read_train_masks()
@@ -170,6 +171,3 @@ def vis_all_activations(model):
     for i, layer in enumerate(layers):
         print("Visualizing layer {}({}) activations".format(i, layer.name))
         vis_activation_maximizations(model, i)
-
-
-

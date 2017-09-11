@@ -1,10 +1,11 @@
-from scipy import ndimage
-from matplotlib import pyplot as plt
-import seaborn as sns
 import cv2
+import seaborn as sns
+from matplotlib import pyplot as plt
+from scipy import ndimage
 
-from utils.params import *
 from utils.filename import get_filepath_from_code
+from utils.params import *
+
 
 """
     Utilities to open and show image given car code and angle code.
@@ -33,4 +34,3 @@ def show_image(car_code, angle_code, mask = False):
     car_img = read_image(car_code, angle_code, mask)    
     plt.imshow(car_img)
     plt.show()
-

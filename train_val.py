@@ -1,21 +1,18 @@
 import cv2
+import numpy as np
 from keras.callbacks import (CSVLogger, EarlyStopping, ModelCheckpoint,
                              ReduceLROnPlateau, TensorBoard)
 from keras_tqdm import TQDMCallback, TQDMNotebookCallback
-
-from tqdm import tqdm
-
 from sklearn.model_selection import train_test_split
-
-import numpy as np
+from tqdm import tqdm
 
 import utils.data as data
 import utils.generator as gen
-import utils.models as models
 import utils.losses as losses
+import utils.models as models
 import utils.zf_baseline as zf_baseline
 from utils.filename import *
-from utils.image import * 
+from utils.image import *
 from utils.params import *
 
 train_masks = data.read_train_masks()

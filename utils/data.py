@@ -1,6 +1,8 @@
-import pandas as pd
-from utils.params import *
 import os
+
+import pandas as pd
+
+from utils.params import *
 
 
 def read_test_ids():
@@ -30,4 +32,3 @@ def list_test_files():
         List all test files from the `./input/test`
     """
     return os.listdir(TEST_DIR_PATH)
-
