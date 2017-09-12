@@ -13,7 +13,7 @@ One of the reason I decided to do the Machine Learning Nanodegree was my growing
 computational perception. There are several closely related perception problems that are being 
 addressed using the rapidly emerging field of deep learning. This project is one variant of the 
 problem of [Image Segmenation](https://en.wikipedia.org/wiki/Image_segmentation) inspired from 
-the [Kaggle Image Masking Challenge](https://www.kaggle.com/c/carvana-image-masking-challenge).   
+the [Kaggle Image Masking Challenge][carvana].   
 
 Historically, the problem of image segmentation has been solved by using traditional Computer 
 vision principles like k-means clustering, thresholding, edge detection and even lossy compression 
@@ -22,7 +22,7 @@ between different problems or different datasets.The problem of image segmentati
 various domains ranging from robot perception to medical image analysis and the results obtained and 
 models created are transferable to these domains as well.
 
-The challenge is organized by [Carvana](https://www.carvana.com/). An interesting part of their innovation is a custom rotating photo studio that automatically captures and processes 16 standard images of each vehicle in their inventory. While they capture high quality photos, bright reflections and cars with similar colors as the background cause automation errors, which requires a skilled photo editor to fix. In this project we are going to develop an algorithm that automatically removes the photo studio background. This will allow Carvana to superimpose cars on a variety of backgrounds. We will be analyzing a dataset of photos, covering different vehicles with a wide variety of year, make and model combinations.
+The challenge is organized by [Carvana](https://www.carvana.com/). An interesting part of their innovation is a custom rotating photo studio that automatically captures and processes 16 standard images of each vehicle in their inventory. While they capture high quality photos, bright reflections and cars with similar colors as the background cause automation errors, which requires a skilled photo editor to fix. In this project I am going to develop an algorithm that automatically removes the photo studio background. This will allow Carvana to superimpose cars on a variety of backgrounds. I will be analyzing a dataset of photos, covering different vehicles with a wide variety of year, make and model combinations.
 ![problem](images/carvana_graphics.png)
 
 ### Problem Statement
@@ -32,7 +32,7 @@ image. The problem is in automatically create an image mask for unseen images of
 similar setting. One potential solution that I could immediately come think of was using Deep Neural 
 Network that would label each pixel of the input image as belonging to background or automobile. The 
 background pixels can then be masked to create an image mask for the given image.   
-Specifically we will be using a U-net architecture that use Convolution layers to generate pixel level classification on the input image. These architectures are discussed in the following sections in more detail.
+Specifically I will be using a U-net architecture that use Convolution layers to generate pixel level classification on the input image. These architectures are discussed in the following sections in more detail.
 
 ### Metrics
 
@@ -101,25 +101,25 @@ Here is the learning graph for the model.
 This model can also be improved by using data augmentation methods used in the following sections.
 
 #### Corrupt data   
-during random visualization of the dataset i was able to find out a few samples that do not have a (nearly)perfect mask. These anomalies are mostly because of very thin apendages such as spoilers or antennas, regular patterns such as wheel spokes or translucent features such as glasses. These samples may cause issues, and we can try to improve the score by removing these samples from the train dataset. However, I have decided to not remove these samples and rely on data augmentation to provide regularization effects against these samples.   
+during random visualization of the dataset i was able to find out a few samples that do not have a (nearly)perfect mask. These anomalies are mostly because of very thin appendages such as spoilers or antennas, regular patterns such as wheel spokes or translucent features such as glasses. These samples may cause issues, and we can try to improve the score by removing these samples from the train dataset. However, I have decided to not remove these samples and rely on data augmentation to provide regularization effects against these samples.   
 ![alt](images/curroptedF.png)   
 
 
 ### Algorithms and Techniques   
 
-CNNs have been known to perform well for image recognition problems. The next step after classification is segmentation, which has its applications in autonomous driving, human-machine interaction, computational photography, image search engines, augmented reality and medical image diagnostics to name a few. A brief overview of various deep learning techniques is done [here](https://arxiv.org/pdf/1704.06857.pdf).   
-The main idea behind these networks is to output spatial maps instead of classification scores. This is accomplished by replacing *fully connected* layers with *convolution* layer. Here is an illustration from one of the earlier works to use this technique, [Fully Convolution Networks for Semantic Segmentation](https://arxiv.org/abs/1411.4038).   
+CNNs have been known to perform well for image recognition problems. The next step after classification is segmentation, which has its applications in autonomous driving, human-machine interaction, computational photography, image search engines, augmented reality and medical image diagnostics to name a few. A brief overview of various deep learning techniques is done [here][segmentation-review].
+The main idea behind these networks is to output spatial maps instead of classification scores. This is accomplished by replacing *fully connected* layers with *convolution* layer. Here is an illustration from one of the earlier works to use this technique, [Fully Convolution Networks for Semantic Segmentation][sem-segment].   
 ![alt](images/fcnSegment.png)   
 
 Despite the power and flexibility of the FCN model, it still lacks various features which hinder its application to certain problems and situations: its inherent spatial invariance does not take into account useful global context information, no-instance awareness is present, efficiency is still far from real time execution at high resolutions, and it is not completely suited for unstructured data such as 3D point clouds or models.   
-There have been various different approaches to address these issues, viz. [SegNet]() which uses Encoder-Decoder type network to output a high resolution map.   
+There have been various different approaches to address these issues, viz. [SegNet][segnet] which uses Encoder-Decoder type network to output a high resolution map.   
 ![alt](images/segnet.png)   
 
 These methods have received significant success since fine-grained or local information is crucial to achieve good pixel-level accuracy. However, it is also important to integrate information from the global context of the image to be able to resolve local ambiguities. Vanilla CNNs struggle to keep this balance, pooling layers being one of the sources that dispose of global context information. Many approaches have been taken to make Vanilla CNNs aware of the global information. One such approach is multi-scale aggregation[74].
 ![alt](images/multiscaleseg.png)   
 
 Here, inputs at different scales is concatenated to output from convolution layers and fed further into the network.   
-In this project we are going to use *u-net*, a variation of the above approach for training and inference. This model has been applied to [medical image segmentation])(https://arxiv.org/abs/1505.04597) on data with segmentation masks. This is very similar to our problem and is a simplified version of the general problem of image segmentation and multiple instance learning with multiple(hundreds) classes.   
+In this project we are going to use *u-net*, a variation of the above approach for training and inference. This model has been applied to [medical image segmentation][unet] on data with segmentation masks. This is very similar to our problem and is a simplified version of the general problem of image segmentation and multiple instance learning with multiple(hundreds) classes.   
 ![alt](images/unet.png)
 
 ### Benchmark   
@@ -228,61 +228,89 @@ We are going to use both these options.
 ## IV. Results
 
 ### Model Evaluation and Validation
-Since this is a Kaggle competition, the test data that we have is not labeled, i.e. we don't have correct output masks available for the test dataset. So, for evaluating our model we can either remove some data from the training set and keep aside for testing(before the train-validation split). However, I decided to use the score provided by Kaggle public leaderboard for model evaluation. To do this, I needed to predict the masks for each of the images available in the test set(`/input/test`), and convert them to rle encoding for submission. This model achieves a score of **0.9886** on the public leaderboard.    
+Since this is a Kaggle competition, the test data that we have is not labeled, i.e. we don't have correct output masks available for the test dataset. So, for evaluating our model we can either remove some data from the training set and keep aside for testing(before the train-validation split). However, I decided to use the score provided by Kaggle public leaderboard for model evaluation. To do this, I needed to predict the masks for each of the images available in the test set(`/input/test`), and convert them to rle encoding for submission. This model achieves a score of **0.9886** on the public leaderboard and the final score of **0.989057** on the sample validation set.    
+
 Masks generated by our final model.   
 *Original Image, Sigmoid Prediction, Prediction with threshold(0.001)*
 ![alt](images/unet128_pred_highres.png)   
 
 The masks produced by our final model look reasonable to the naked eye, and they are a huge improvement over our last result using a simple 3 layer CNN model.   
 
-Further, we can also validate how good our model is in generating masks for different *kind* of images that it has never seen before. This is not a part of the kaggle challenge and hence the input images are just some freely available stock images taken from [here](!slhslj)
+Further, we can also validate how good our model is in generating masks for images external to the dataset. This is not a part of the kaggle challenge and hence the input images are just some freely available stock photos taken from google images.
 
+![alt](images/car_dog_out/baseline_car_03.png)
+![alt](images/car_dog_out/unet_128_car_03.png)
+![alt](images/car_dog_out/baseline_car_08.png)
+![alt](images/car_dog_out/unet_128_car_08.png)
+![alt](images/car_dog_out/baseline_notcar_08.png)
+![alt](images/car_dog_out/unet_128_notcar_08.png)
+
+![alt](images/car_dog_out/unet_128_car_02.png)
+
+More results can be seen by running the program.   
+
+Here we can see that the model is able to segment a vehicle, given the background has a relatively uniform colors, with no particularly noticeable features.   
 
 ## V. Conclusion
 
 ### Free-Form Visualization
-One of the major issues with Neural networks is that of reasonability, i.e. given the model architecture and weights it is very difficult to readon *why* the model behaves the way it does. Some of these issues can be addressed by visualizing the intermediate layer activations for a given input.   
+One of the major issues with Neural networks is that of reasonability, i.e. given the model architecture and weights it is very difficult to reason *why* the model behaves the way it does. Some of these issues can be addressed by visualizing the intermediate layer activations for a given input.   
 In this section we provide some of the intermediate layer activations for the baseline model and our final unet model.   
 
+**Baseline activations for a sample image**   
+*Layer 1*   
+![alt](images/baseline_activations1.png)   
+*Layer 2*   
+![alt](images/baseline_activations2.png)   
+*Final Output Layer*   
+![alt](images/baseline_activations3.png)   
+**UNet 128 activations for a sample image(only pooling and upsampling layers are shown here)**   
+![alt](images/unet_act/unet_128_7_max_pooling2d_1.png)
+![alt](images/unet_act/unet_128_14_max_pooling2d_2.png)
+![alt](images/unet_act/unet_128_21_max_pooling2d_3.png)
+![alt](images/unet_act/unet_128_28_up_sampling2d_1.png)
+![alt](images/unet_act/unet_128_39_up_sampling2d_2.png)
+![alt](images/unet_act/unet_128_50_up_sampling2d_3.png)
+![alt](images/unet_act/unet_128_60_activation_17.png)
+![alt](images/unet_act/unet_128_63_conv2d_18.png)
 
-In this section, you will need to provide some form of visualization that emphasizes an important quality about the project. It is much more free-form, but should reasonably support a significant result or characteristic about the problem that you want to discuss. Questions to ask yourself when writing this section:
-- _Have you visualized a relevant or important quality about the problem, dataset, input data, or results?_
-- _Is the visualization thoroughly analyzed and discussed?_
-- _If a plot is provided, are the axes, title, and datum clearly defined?_
+
+These images show that the filters are progressively extracting a more generalized shape from the sample, instead of hard features.
 
 ### Reflection
-In this section, you will summarize the entire end-to-end problem solution and discuss one or two particular aspects of the project you found interesting or difficult. You are expected to reflect on the project as a whole to show that you have a firm understanding of the entire process employed in your work. Questions to ask yourself when writing this section:
-- _Have you thoroughly summarized the entire process you used for this project?_
-- _Were there any interesting aspects of the project?_
-- _Were there any difficult aspects of the project?_
-- _Does the final model and solution fit your expectations for the problem, and should it be used in a general setting to solve these types of problems?_
+
+In this project, I tackle a simpler form of the more general object segmentation problem found in many computer vision applications. The approach I have taken is also extendable to those problems. We are provided with input images of automobiles photographed in a studio setting. This also makes the learning process much simpler than the general problem. 
+I use a UNet based CNN model to learn pixel-wise mask from a given image. This helps in maintaining local information about image regions and hence can give much better results for segmentation tasks than vanilla CNNs. We have used a very low resolution input image to make these predictions and still were able to get a *good* score.
+U-Nets and CNNs in general are taking over the domain of computer vision applications and are expected to drive the domain much further in the coming future. 
 
 ### Improvement
-In this section, you will need to provide discussion as to how one aspect of the implementation you designed could be improved. As an example, consider ways your implementation can be made more general, and what would need to be modified. You do not need to make this improvement, but the potential solutions resulting from these changes are considered and compared/contrasted to your current solution. Questions to ask yourself when writing this section:
-- _Are there further improvements that could be made on the algorithms or techniques you used in this project?_
-- _Were there algorithms or techniques you researched that you did not know how to implement, but would consider using if you knew how?_
-- _If you used your final solution as the new benchmark, do you think an even better solution exists?_
 
------------
-
-**Before submitting, ask yourself. . .**
-
-- Does the project report you’ve written follow a well-organized structure similar to that of the project template?
-- Is each section (particularly **Analysis** and **Methodology**) written in a clear, concise and specific fashion? Are there any ambiguous terms or phrases that need clarification?
-- Would the intended audience of your project be able to understand your analysis, methods, and results?
-- Have you properly proof-read your project report to assure there are minimal grammatical and spelling mistakes?
-- Are all the resources used for this project correctly cited and referenced?
-- Is the code that implements your solution easily readable and properly commented?
-- Does the code execute without error and produce results similar to those reported?
-
+In the current form, there are a lot of improvements that can be employed to improve the score on the test set,
+* Use higher resolution input images. The original input image and masks are `1918X1280` resolution. The problem setters(from Kaggle) have provided a separate dataset of even higher input images. Using higher resolution inputs would certainly improve the final score. However, we might have to add layers more hidden layers to our model to accommodate a higher size input to learn.
+* We could use more sophisticated neural network architectures, viz. [R-CNN][rcnn] and its derivatives, particularly [Mask R-CNN][mask-rcnn]. 
+* There are pre-trained SegNet and ResNet models available that can be built upon for image segmentation tasks. We can leverage the initial layers of those models to train our network.
+A combination of one or more of these approaches can certainly give a better result for our problem, however these solutions come with there own complexities in terms of computational resources, which can be dealt with on a certain extent if we use transfer learning.
 
 ### References
 
-1. [Carvana Image Masking Chalenge](https://www.kaggle.com/c/carvana-image-masking-challenge)
-2. [A Review of Deep Learning Techniques Applied to Semantic Segmentation](https://arxiv.org/pdf/1704.06857.pdf)   
-3. [Convolution Networks for Visual Recognition](http://cs231n.github.io/)
-4. [Fully Convolution Networks for Semantic Segmentation](https://arxiv.org/abs/1411.4038)
-5. [SegNet]()
-6. [Multi-Scale Convolutional Architecture for Semantic Segmentation](http://www.ri.cmu.edu/pub_files/2015/10/CMU-RI-TR_AmanRaj_revision2.pdf)   
-7. [U-Net: Convolutional Networks for Biomedical Image Segmentation](https://arxiv.org/abs/1505.04597)
-8. [DeepLab](https://arxiv.org/abs/1606.00915)
+1. [Carvana Image Masking Chalenge][carvana]
+2. [A Review of Deep Learning Techniques Applied to Semantic Segmentation][segmentation-review]   
+3. [Convolution Networks for Visual Recognition][cnn-stanford]
+4. [Fully Convolution Networks for Semantic Segmentation][sem-segment]
+5. [SegNet][segnet]
+6. [Multi-Scale Convolutional Architecture for Semantic Segmentation][multiscale]
+7. [U-Net: Convolutional Networks for Biomedical Image Segmentation][unet]
+8. [DeepLab][deeplab]
+9. [Rich feature hierarchies for accurate object detection and semantic segmentation][rcnn]
+10. [Mask R-CNN][mask-rcnn]
+
+[carvana]: https://www.kaggle.com/c/carvana-image-masking-challenge
+[segmentation-review]: https://arxiv.org/pdf/1704.06857.pdf   
+[cnn-stanford]: http://cs231n.github.io/
+[sem-segment]: https://arxiv.org/abs/1411.4038
+[segnet]: https://arxiv.org/abs/1511.00561
+[multiscale]: http://www.ri.cmu.edu/pub_files/2015/10/CMU-RI-TR_AmanRaj_revision2.pdf
+[unet]: https://arxiv.org/abs/1505.04597
+[deeplab]: https://arxiv.org/abs/1606.00915
+[rcnn]: https://arxiv.org/abs/1311.2524
+[mask-rcnn]: https://arxiv.org/abs/1703.06870
