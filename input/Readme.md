@@ -2,7 +2,10 @@
 
 Here the input data for training and testing will be placed.
 
-Doenload the data from [here](https://www.kaggle.com/c/carvana-image-masking-challenge/data).
+Download the data from [here](https://www.kaggle.com/c/carvana-image-masking-challenge/data).   
+
+Apart from this we also test this model on samples external to the dataset. These samples are already present in the directory `car_and_dog`.    
+
 
 After extracting the data, your directory structure should look something like this.   
 ```
