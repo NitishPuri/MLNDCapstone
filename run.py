@@ -3,6 +3,7 @@ import os
 import train_val
 import utils.vis as visutils
 
+""" Options for Main Menu """
 mainOptions = {
     "help" : ("Welcome to MLND Capstone : Image Automasking implementation\n"
               "[1]. Exploration : Visualize data\n"
@@ -19,6 +20,7 @@ mainOptions = {
     5 : exit
 }
 
+""" Options for Data Explorations Menu """
 exploreOptions = {
     "help" : ("Exploring data..\n"
               "[1]. Explore raw data(without input masks)\n" 
@@ -38,6 +40,7 @@ exploreOptions = {
     7 : lambda : setCurrMenu(mainOptions)
 }
 
+""" Options for UNet Model Menu """
 uNetOptions = {
     "help" : ("U-Net Model..\n"
               "[1].  Model Summary\n" 
@@ -59,6 +62,7 @@ uNetOptions = {
     8  : lambda : setCurrMenu(mainOptions)
 }
 
+""" Options for Avg Mask Baseline Menu """
 baseline1_avgMask_options = {
     "help" : ("Baseline 1(Using Avg Mask)\n"
               "[1]. View Avg Mask(create if not available)\n" 
@@ -72,7 +76,7 @@ baseline1_avgMask_options = {
     4  : lambda : setCurrMenu(mainOptions)
 }
 
-
+""" Options for Simple CNN Baseline Model """
 baseline2_simpleCNN_options = {
     "help" : ("Baseline 2 (Using Vanilla CNN)..\n"
               "[1].  Model Summary\n" 
@@ -94,6 +98,7 @@ baseline2_simpleCNN_options = {
     8  : lambda : setCurrMenu(mainOptions)
 }
 
+""" Options for Maker Model Menu """
 maker_model_options = {
     "help" : ("Manufacturer Model (Guess the maker, experimental)..\n"
               "[1].  Model Summary\n" 
@@ -124,14 +129,13 @@ if __name__=="__main__":
         os.system('cls')
         print(currMenu["help"]) 
         try:
-            choice = int(input())
+            print(' ')
+            choice = int(input("Enter your choice... : "))
             currMenu[choice]()
         except ValueError:
-            print("ValueError,..")
             print("Unimplemented Option,..")
             input("Press Enter to continue...")
         except KeyError:
-            print("KeyError,..")
             print("Unimplemented Option,..")
             input("Press Enter to continue...")
             pass
