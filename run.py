@@ -6,17 +6,17 @@ import utils.vis as visutils
 mainOptions = {
     "help" : ("Welcome to MLND Capstone : Image Automasking implementation\n"
               "[1]. Exploration : Visualize data\n"
-              "[2]. U-Net Model Analysis\n"
-              "[3]. Baseline 1(Using Avg Mask)\n"
-              "[4]. Baseline 2(Simple 3 layer CNN)\n"
-              "[5]. Maker Model(Experimental)\n"
-              "[6]. Exit" ),
+              "[2]. Baseline 1(Using Avg Mask)\n"
+              "[3]. Baseline 2(Simple 3 layer CNN)\n"
+              "[4]. U-Net Model\n"
+            #   "[5]. Maker Model(Experimental)\n"
+              "[5]. Exit" ),
     1 : lambda : setCurrMenu(exploreOptions),
-    2 : lambda : setCurrMenu(uNetOptions),
-    3 : lambda : setCurrMenu(baseline1_avgMask_options),
-    4 : lambda : setCurrMenu(baseline2_simpleCNN_options),
-    5 : lambda : setCurrMenu(uNetOptions),
-    6 : exit
+    2 : lambda : setCurrMenu(baseline1_avgMask_options),
+    3 : lambda : setCurrMenu(baseline2_simpleCNN_options),
+    4 : lambda : setCurrMenu(uNetOptions),
+    # 5 : lambda : setCurrMenu(uNetOptions),
+    5 : exit
 }
 
 exploreOptions = {
@@ -44,23 +44,19 @@ uNetOptions = {
               "[2].  Train model\n"
               "[3].  Plot training summary\n"
               "[4].  Visualize sample predictions\n"
-              "[5].  Create submission.\n"
-              "[6].  Visualize layer activations.\n"
-              "[7].  Visualize filters(using activation maximization).\n"
-              "[8].  Visualize predictions on external images(car, experimental).\n"
-              "[9]. Visualize predictions on external images(notCar, experimental).\n"
-              "[10]. Back to Main menu.\n"),
+              "[5].  Calculate Validation Score.\n"
+              "[6].  Create submission.\n"
+              "[7].  Visualize predictions on external dataset.\n"
+              "[8]. Back to Main menu.\n"),
 
     1  : lambda : train_val.show_uNet_summary() ,
     2  : lambda : train_val.trainUnet128Model(),
-    # 3  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.4, augment = True),
-    # 4  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.0, augment = True),
-    # 5  : lambda : visutils.vis_manufacturer_distribution(),
-    # 6  : lambda : setCurrMenu(mainOptions),
-    # 7  : lambda : setCurrMenu(mainOptions),
-    # 8  : lambda : setCurrMenu(mainOptions),
-    # 9  : lambda : setCurrMenu(mainOptions),
-    10 : lambda : setCurrMenu(mainOptions)
+    3  : lambda : visutils.plot_unet128_stats(),
+    4  : lambda : train_val.vis_unet128_predictions(),
+    5  : lambda : train_val.score_unet_val(),
+    6  : lambda : train_val.create_unet_submission(),
+    7  : lambda : train_val.vis_predictions_baseline_external(),
+    8  : lambda : setCurrMenu(mainOptions)
 }
 
 baseline1_avgMask_options = {
@@ -71,7 +67,7 @@ baseline1_avgMask_options = {
               "[4]. Back to Main menu.\n" ),
 
     1  : lambda : train_val.show_avg_mask(),
-    2  : lambda : train_val.score_baseline_val_score(),
+    2  : lambda : train_val.score_avg_baseline_val_score(),
     3  : lambda : train_val.create_avgMask_submission(),
     4  : lambda : setCurrMenu(mainOptions)
 }
@@ -83,40 +79,36 @@ baseline2_simpleCNN_options = {
               "[2].  Train model\n"
               "[3].  Plot training summary\n"
               "[4].  Visualize sample predictions\n"
-              "[5].  Create submission.\n"
-              "[6].  Visualize layer activations.\n"
-              "[7].  Visualize filters(using activation maximization).\n"
-              "[8].  Visualize predictions on external images(car, experimental).\n"
-              "[9].  Visualize predictions on external images(notCar, experimental).\n"
-              "[10]. Back to Main menu.\n"),
+              "[5].  Calculate Validation score\n"
+              "[6].  Create submission.\n"
+              "[7].  Visualize predictions on external dataset.\n"
+              "[8].  Back to Main menu.\n"),
 
     1  : lambda : train_val.show_baseline_2_summary(),
     2  : lambda : train_val.trainBaselineModel(),
     3  : lambda : visutils.plot_baseline_stats(),
-    # 4  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.0, augment = True),
-    # 5  : lambda : visutils.vis_manufacturer_distribution(),
-    # 6  : lambda : setCurrMenu(mainOptions),
-    # 7  : lambda : setCurrMenu(mainOptions),
-    # 8  : lambda : setCurrMenu(mainOptions),
-    # 9  : lambda : setCurrMenu(mainOptions),
-    10 : lambda : setCurrMenu(mainOptions)
+    4  : lambda : train_val.vis_baseline_predictions() ,
+    5  : lambda : train_val.score_baseline_val(),
+    6  : lambda : train_val.create_baseline_submission(),
+    7  : lambda : train_val.vis_predictions_baseline_external(),
+    8  : lambda : setCurrMenu(mainOptions)
 }
 
 maker_model_options = {
     "help" : ("Manufacturer Model (Guess the maker, experimental)..\n"
               "[1].  Model Summary\n" 
-              "[3].  Train model\n"
-              "[4].  Plot training summary\n"
-              "[5].  Visualize sample predictions\n"
-              "[6].  Visualize layer activations.\n"
-              "[7]. Back to Main menu.\n"),
+              "[2].  Train model\n"
+              "[3].  Plot training summary\n"
+              "[4].  Visualize sample predictions\n"
+              "[5].  Visualize layer activations.\n"
+              "[6]. Back to Main menu.\n"),
 
     1  : lambda : train_val.show_manufacturerModel_summary(),
-    3  : lambda : train_val.trainManufacturerModel(),
-    # 4  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.4, augment = True),
-    # 5  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.0, augment = True),
+    2  : lambda : train_val.trainManufacturerModel(),
+    3  : lambda : visutils.plot_manufacturer_stats(),
+    5  : lambda : visutils.vis_dataset(nrows = 2, ncols = 2, mask_alpha = 0.0, augment = True),
     # 6  : lambda : visutils.vis_manufacturer_distribution(),
-    7  : lambda : setCurrMenu(mainOptions)
+    6  : lambda : setCurrMenu(mainOptions)
 }
 
 
@@ -128,7 +120,6 @@ def setCurrMenu(menu):
     currMenu = menu
 
 if __name__=="__main__":
-    # os.system('cls')
     while(True):
         os.system('cls')
         print(currMenu["help"]) 
