@@ -15,6 +15,7 @@ pip install -r requirements.txt
 ```
 * Download the data from [here](https://www.kaggle.com/c/carvana-image-masking-challenge/data).
     You need to place and extract the downloaded data into `/input` directory. See [here](./input/Readme.md) for the final directory structure.
+* Download pre-trained weights. More information [here](./models/Readme.md)
 * Once the data is in place, you can launch the command line interface,
 ```
 python run.py
