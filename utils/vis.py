@@ -12,6 +12,7 @@ from utils.filename import *
 from utils.image import *
 from utils.params import *
 from utils.preprocess import *
+import utils.models as models
 
 train_masks = data.read_train_masks()
 
@@ -45,6 +46,34 @@ def vis_dataset(nrows = 5, ncols = 5, mask_alpha = 0.4, augment = False):
             counter += 1
     plt.show()
 
+# def vis_manufacturer_predictions(nrows = 5, ncols = 5):
+    
+#     """ Sample some images from the dataset and show them in a grid."""
+
+#     model = models.get_manufacturer_model()
+#     model.load_weights('./models/manufacturer_model.best_weights.hdf5')
+
+#     f, ax = plt.subplots(nrows = nrows, ncols = ncols, sharex = True, sharey = True, figsize=(20,20))
+#     sampled_imgs = np.random.choice(train_masks['img'], nrows*ncols)
+    
+#     counter = 0
+#     for i in range(nrows):
+#         for j in range(ncols):
+#             car_code, angle_code = filename_to_code(sampled_imgs[counter])
+#             image = read_image(car_code, angle_code)
+
+#             image = resize(image)
+                
+#             x_batch = []
+#             x_batch.append(image)
+#             x_batch = np.array(x_batch, np.float32) /255
+#             pred = model.predict(x_batch).squeeze()
+
+#             ax[i, j].imshow(image)
+#             model.predict
+
+#             counter += 1
+#     plt.show()
 
 # Sample some images from the dataset and show them in a grid
 def vis_curropted_dataset():
@@ -110,12 +139,23 @@ def plot_baseline_stats():
     baseline_history_DF[['loss', 'val_loss']].plot(ax = axes[1])
     fig.show()
 
+def plot_unet128_stats():
+    print("Here,..")
+    # baseline_history_DF = pd.DataFrame(baseline_history.history)
+    unet_128_history = pd.read_csv('logs/unet_128_history.csv')
+    fig, axes = plt.subplots(nrows = 1, ncols = 2, figsize=(10, 5))
+    unet_128_history[['dice_coeff', 'val_dice_coeff']].plot(ax = axes[0]);
+    # pd.DataFrame(baseline_history.history)[['acc', 'val_acc']].plot()
+    unet_128_history[['loss', 'val_loss']].plot(ax = axes[1])
+    fig.show()
+
+
 def vis_predictions(model, fullRes=False):
     nrows = 3
     f, ax = plt.subplots(nrows = nrows, ncols = 3, sharex = True, sharey = True, figsize=(20,20))
     # print(ax.__class__)
     sampled_imgs = np.random.choice(train_masks['img'], nrows)
-#     sampled_imgs = [TRAIN_PATH + '/' + i for i in sampled_imgs]
+    #     sampled_imgs = [TRAIN_PATH + '/' + i for i in sampled_imgs]
     
     counter = 0
 
