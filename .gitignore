@@ -3,6 +3,9 @@ input/test
 input/train_masks
 input/zip
 input/*.csv
+input/img
+input/img_act
+input/car_and_dog - orig
 ref/
 
 
