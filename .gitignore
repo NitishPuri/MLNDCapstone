@@ -17,9 +17,6 @@ events.out.*
 *.pyc
 
 # Temporary exlusions
-*.pdf
-images/img
-images/img_act
 input/exp
 *.hdf5
 subm/
