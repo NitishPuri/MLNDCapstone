@@ -82,68 +82,16 @@ def score_baseline_val():
     baseline_model = models.get_baseline_model()
     baseline_model.load_weights('models/baseline_model.best_weights.hdf5')
 
-    num_val_samples = 600
-    val_batch = validation_images[0:num_val_samples]
-
-    score = 0.0
-
-    print("Calculating score over {} validation images.".format(num_val_samples))
-
-    # Should use batches for predicting if this seems slow.
-    for val_img in tqdm(val_batch):
-        car_code, angle_code = filename_to_code(val_img)
-        image = read_image(car_code, angle_code)
-        im = resize(image)
-        mask = read_image(car_code, angle_code, mask=True)
-
-        x_batch = []
-        x_batch.append(im)
-        x_batch = np.array(x_batch, np.float32) /255
-        
-        prediction = baseline_model.predict(x_batch).squeeze()
-        prediction = cv2.resize(prediction, (image.shape[1], image.shape[0]))
-        prediction = (prediction > THRESHOLD)
-        score += losses.dice_coeff_numpy(mask, prediction)
-
-    score = score/num_val_samples
+    score = score_model_val(baseline_model)
 
     print("Simple Baseline score on Validation Set : {:.6f}".format(score))
     input("\nPress Enter to continue...")
 
 def create_baseline_submission():
+
     baseline_model = models.get_baseline_model()
     baseline_model.load_weights('models/baseline_model.best_weights.hdf5')
-    rles = []
-    orig_width = 1918
-    orig_height = 1280
-    ids_test = data.list_test_files()
-    print('Predicting on {} samples with batch_size = {}...'.format(len(ids_test), BATCH_SIZE))
-    for start in tqdm(range(0, len(ids_test), BATCH_SIZE)):
-        x_batch = []
-        end = min(start + BATCH_SIZE, len(ids_test))
-        ids_test_batch = ids_test[start:end]
-        for id in ids_test_batch:
-            car_code, angle_code = filename_to_code(id)
-            img = read_image(car_code, angle_code, test = True)
-            img = resize(img)
-            x_batch.append(img)
-        x_batch = np.array(x_batch, np.float32) / 255
-        preds = baseline_model.predict_on_batch(x_batch)
-        preds = np.squeeze(preds, axis = 3)
-        for pred in preds:
-            prob = cv2.resize(pred, (orig_width, orig_height))
-            mask = prob > THRESHOLD
-            rle = encoder.run_length_encode(mask)
-            rles.append(rle)
-
-    print("Generating submission file,..")
-
-    filename = 'submit/baseline_001.csv.gz'
-    df = pd.DataFrame({'img':names, 'rle_mask':rles})
-    df.to_csv(filename, index = False, compression='gzip')
-
-    print("Generated submission file,.. {}".format(filename))
-    input("Press any key to continue...")
+    create_model_submission(unet_128_model, 'submit/baseline.csv.gz')    
 
 def vis_predictions_baseline_external():
     baseline_model = models.get_baseline_model()
@@ -201,7 +149,7 @@ def trainUnet128Model():
                 # TensorBoard(log_dir='./logs/unet_128', histogram_freq = 1,
                 #             batch_size = BATCH_SIZE, write_graph=True,
                 #             write_images=True, write_grads=True),
-                CSVLogger('./logs/unet_128_history01.csv'),
+                CSVLogger('./logs/unet_128_history.csv'),
                 EarlyStopping(monitor='val_loss', patience=8, verbose=1, min_delta=1e-4),
                 ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=4, verbose=1, epsilon=1e-4),
                 TQDMCallback()]
@@ -219,3 +167,86 @@ def trainUnet128Model():
 def show_uNet_summary():
     models.get_unet_128().summary()
     input("Press Enter to continue...")
+
+def vis_unet128_predictions():
+    unet_128_model = models.get_unet_128()
+    unet_128_model.load_weights('models/unet_128.best_weights.hdf5')
+    visutils.vis_predictions(unet_128_model, fullRes = True) 
+
+def score_unet_val():
+    unet_128_model = models.get_unet_128()
+    unet_128_model.load_weights('models/unet_128.best_weights.hdf5')
+    score = score_model_val(unet_128_model)
+
+    print("U-Net score on Validation Set : {:.6f}".format(score))
+    input("\nPress Enter to continue...")
+
+def create_unet_submission():
+    unet_128_model = models.get_unet_128()
+    unet_128_model.load_weights('models/unet_128.best_weights.hdf5')
+    create_model_submission(unet_128_model, 'subm/unet_128.csv.gz')    
+
+def vis_predictions_baseline_external():
+    unet_128_model = models.get_unet_128()
+    unet_128_model.load_weights('models/unet_128.best_weights.hdf5')
+    visutils.vis_predictions_ext(unet_128_model, data.list_car_and_dog_images())
+
+def score_model_val(model):
+    num_val_samples = 600
+    val_batch = validation_images[0:num_val_samples]
+
+    score = 0.0
+
+    print("Calculating score over {} validation images.".format(num_val_samples))
+
+    # Should use batches for predicting if this seems slow.
+    for val_img in tqdm(val_batch):
+        car_code, angle_code = filename_to_code(val_img)
+        image = read_image(car_code, angle_code)
+        im = resize(image)
+        mask = read_image(car_code, angle_code, mask=True)
+
+        x_batch = []
+        x_batch.append(im)
+        x_batch = np.array(x_batch, np.float32) /255
+        
+        prediction = model.predict(x_batch).squeeze()
+        prediction = cv2.resize(prediction, (image.shape[1], image.shape[0]))
+        prediction = (prediction > THRESHOLD)
+        score += losses.dice_coeff_numpy(mask, prediction)
+
+    score = score/num_val_samples
+
+    return score
+
+def create_model_submission(model, filename):
+    rles = []
+    orig_width = 1918
+    orig_height = 1280
+    ids_test = data.list_test_files()
+    print('Predicting on {} samples with batch_size = {}...'.format(len(ids_test), BATCH_SIZE))
+    for start in tqdm(range(0, len(ids_test), BATCH_SIZE)):
+        x_batch = []
+        end = min(start + BATCH_SIZE, len(ids_test))
+        ids_test_batch = ids_test[start:end]
+        for id in ids_test_batch:
+            car_code, angle_code = filename_to_code(id)
+            img = read_image(car_code, angle_code, test = True)
+            img = resize(img)
+            x_batch.append(img)
+        x_batch = np.array(x_batch, np.float32) / 255
+        preds = model.predict_on_batch(x_batch)
+        preds = np.squeeze(preds, axis = 3)
+        for pred in preds:
+            prob = cv2.resize(pred, (orig_width, orig_height))
+            mask = prob > THRESHOLD
+            rle = encoder.run_length_encode(mask)
+            rles.append(rle)
+
+    print("Generating submission file,..")
+
+    df = pd.DataFrame({'img':names, 'rle_mask':rles})
+    df.to_csv(filename, index = False, compression='gzip')
+
+    print("Generated submission file,.. {}".format(filename))
+    input("Press any key to continue...")
