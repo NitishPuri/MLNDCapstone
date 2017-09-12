@@ -22,6 +22,7 @@ train_images, validation_images = train_test_split(train_masks['img'], train_siz
 
 """ Manufacturer Model """
 def trainManufacturerModel():
+    """ Train Manufacturer Model """
     manufacturer_model = models.get_manufacturer_model()
 
     callbacks = [ ModelCheckpoint(filepath='models/manufacturer_model.best_weights.hdf5', 
@@ -38,7 +39,7 @@ def trainManufacturerModel():
                                         validation_data=gen.val_manufacturer_gen(), 
                                         callbacks = callbacks)
 
-def show_manufacturerModel_summary():
+def show_manufacturerModel_summary():    
     manufacturer_model = models.get_manufacturer_model().summary()
     input("Press Enter to continue...")
 
@@ -94,6 +95,8 @@ def create_baseline_submission():
     create_model_submission(unet_128_model, 'submit/baseline.csv.gz')    
 
 def vis_predictions_baseline_external():
+    """ Visualize external data predictions using baseline model. """
+
     baseline_model = models.get_baseline_model()
     baseline_model.name = 'baseline'
     baseline_model.load_weights('models/baseline_model.best_weights.hdf5')
