@@ -9,49 +9,59 @@ from utils.filename import *
 from utils.image import *
 from utils.params import *
 
-# train_masks = pd.read_csv(TRAIN_MASKS_CSV_PATH)
-# print(train_masks.head())
-
-# encoder.test_rle_encode(train_masks)
+import scipy.misc
 
 
 baseline_model = models.get_baseline_model()
-# baseline_model.summary()
+baseline_model.name = 'baseline'
+baseline_model.load_weights('models/baseline_model.best_weights.hdf5')
 
-# pred = baseline_model.predict()
+unet_128_model = models.get_unet_128()
+unet_128_model.name = 'unet_128'
+unet_128_model.load_weights('models/unet_128.best_weights.hdf5')
 
-# sample_car_code = '00087a6bd4dc'
-# sample_angle_code = '04'
-
-# fig, 
+samples = data.list_car_and_dog_images()
 
 
-threshold = 0.001
-rles = []
+modelList = [baseline_model, unet_128_model]
+for i, model in enumerate(modelList):
+    for sample in tqdm(samples):
+        image = ndimage.imread(sample)
 
-orig_width = 1918
-orig_height = 1280
+        f, ax = plt.subplots(nrows = 1, ncols = 3, sharex = True, sharey = True, figsize=(20,7))
+        
+        # print(image.shape)
+        # try:
+        image = image[:,:,:3]
 
-ids_test = data.list_test_files()
-print('Predicting on {} samples with batch_size = {}...'.format(len(ids_test), BATCH_SIZE))
-for start in tqdm(range(0, len(ids_test), BATCH_SIZE)):
-    x_batch = []
-    end = min(start + BATCH_SIZE, len(ids_test))
-    ids_test_batch = ids_test[start:end]
-    for id in ids_test_batch:
-        car_code, angle_code = filename_to_code(id)
-        img = read_image(car_code, angle_code, test = True)
-        img = resize(img)
-        x_batch.append(img)
-    x_batch = np.array(x_batch, np.float32) / 255
-    preds = baseline_model.predict_on_batch(x_batch)
-    preds = np.squeeze(preds, axis = 3)
-    for pred in preds:
-        prob = cv2.resize(pred, (orig_width, orig_height))
-        mask = prob > threshold
-        rle = encoder.run_length_encode(mask)
-        rles.append(rle)
+        im = resize(image)
+        
+        x_batch = []
+        x_batch.append(im)
+        x_batch = np.array(x_batch, np.float32) /255
+        pred = model.predict(x_batch).squeeze()
 
-print("Generating submission file,..")
-df = pd.DataFrame({'img':names, 'rle_mask':rles})
-df.to_csv('submit/baseline_{}.csv.gz'.format(threshold), index = False, compression='gzip')
+        im = image
+        pred = cv2.resize(pred, (image.shape[1], image.shape[0]))
+
+        filename = sample[0:-4]
+
+        ax[0].imshow(im)
+        ax[0].set_title('input')
+        ax[1].imshow(pred, cmap='gray')
+        ax[1].set_title('output')
+        ax[2].imshow(pred > THRESHOLD, cmap='gray')
+        ax[2].set_title('threshold mask')
+
+        # scipy.misc.imsave('{}_{}_out.jpg'.format(filename, i), pred)
+        # scipy.misc.imsave('{}_{}_mask.jpg'.format(filename, i), (pred > THRESHOLD))        
+
+        filename = filename.split('/')[-1]
+        f.suptitle('{} , {}'.format(model.name, filename))
+        f.savefig('images/car_dog_out/{}_{}.png'.format(model.name, filename, ), dpi = f.dpi)
+        plt.close(f)
+
+        # except IndexError:
+        #     print("Issue with '{}'".format(sample))
+        #     print(ndimage.imread(sample).shape)
+            
