@@ -36,11 +36,11 @@ Specifically I will be using a U-net architecture that use Convolution layers to
 
 ### Metrics
 
-[Dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient) can be used as an evaluation metric for the problem. Dice coefficient is a statistic used for comparing the similarity of two samples. Its range goes from *0* meaning no similarity to *1* meaning maximum similarity. It can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:   
+[Dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient) can be used as an evaluation metric for the problem. Dice coefficient is a statistic used for comparing the similarity of two samples. Its range goes from `0` meaning no similarity to `1` meaning maximum similarity. It can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:   
 ![alt](images/metric.png)   
 where X is the predicted set of pixels and Y is the ground truth. The Dice coefficient is defined to be 1 when both X and Y are empty. For example consider these two example 5X5 image masks.   
 ![alt](images/metricEx.png)   
-
+```
 Here,   
 X = 8,   
 Y = 8,   
@@ -49,17 +49,18 @@ X & Y = 6
 So, 
 QS = (2 * 6)/(8 + 8)   
 QS = 0.75    
-
+```
 The final score can be calculated as the mean of the Dice coefficients for each image in the test set.   
 
 We can convert this to a loss function by using    
-`dice_loss = 1 - QS`   
+```
+dice_loss = 1 - QS
+```   
 
 This can be augmented with `binary_crossenntropy` to calculate a more robust loss function.   
 
 
 ## II. Analysis
-_(approx. 2-4 pages)_
 
 ### Data Exploration
 
@@ -85,9 +86,9 @@ Also, we can get a distribution of car manufacturers in the complete dataset.
 ![alt](images/metadata.png)   
 
 These results show the distribution in train and test sets.   
-**Training data**
+**Training data**                                **Test data**   
+
 ![alt](images/train_metadata.png)
-**Test data**
 ![alt](images/test_metadata.png)
 
 As a *side quest* I decided to train a very crude model that can predict car manufacturer given a car image. Here is the model summary,   
@@ -115,7 +116,7 @@ Despite the power and flexibility of the FCN model, it still lacks various featu
 There have been various different approaches to address these issues, viz. [SegNet][segnet] which uses Encoder-Decoder type network to output a high resolution map.   
 ![alt](images/segnet.png)   
 
-These methods have received significant success since fine-grained or local information is crucial to achieve good pixel-level accuracy. However, it is also important to integrate information from the global context of the image to be able to resolve local ambiguities. Vanilla CNNs struggle to keep this balance, pooling layers being one of the sources that dispose of global context information. Many approaches have been taken to make Vanilla CNNs aware of the global information. One such approach is multi-scale aggregation[74].
+These methods have received significant success since fine-grained or local information is crucial to achieve good pixel-level accuracy. However, it is also important to integrate information from the global context of the image to be able to resolve local ambiguities. Vanilla CNNs struggle to keep this balance, pooling layers being one of the sources that dispose of global context information. Many approaches have been taken to make Vanilla CNNs aware of the global information. One such approach is [multi-scale aggregation][multiscale].
 ![alt](images/multiscaleseg.png)   
 
 Here, inputs at different scales is concatenated to output from convolution layers and fed further into the network.   
@@ -171,8 +172,7 @@ However, we need to consider other problems like computational complexity and ov
     * Randomly scale and rotate the input image while preserving the input dimensions. This would also help us make our model invariant changes in the scale(or distance from camera) of vehicle. We need to make sure that we don't use very large values which might cause the automobile to get cropped or change the orientation drastically.
     * We introduce a random horizontal flip to the inputs.
     Here are some samples produced after augmentation.   
-    ![alt](images/augment1.png)   
-    ![alt](images/augment2.png)   
+    ![alt](images/augment1.png) ![alt](images/augment2.png)   
 
 ### Implementation
 
@@ -231,7 +231,7 @@ We are going to use both these options.
 Since this is a Kaggle competition, the test data that we have is not labeled, i.e. we don't have correct output masks available for the test dataset. So, for evaluating our model we can either remove some data from the training set and keep aside for testing(before the train-validation split). However, I decided to use the score provided by Kaggle public leaderboard for model evaluation. To do this, I needed to predict the masks for each of the images available in the test set(`/input/test`), and convert them to rle encoding for submission. This model achieves a score of **0.9886** on the public leaderboard and the final score of **0.989057** on the sample validation set.    
 
 Masks generated by our final model.   
-*Original Image, Sigmoid Prediction, Prediction with threshold(0.001)*
+*Original Image, Sigmoid Prediction, Prediction with threshold(0.001)*   
 ![alt](images/unet128_pred_highres.png)   
 
 The masks produced by our final model look reasonable to the naked eye, and they are a huge improvement over our last result using a simple 3 layer CNN model.   
@@ -258,9 +258,8 @@ One of the major issues with Neural networks is that of reasonability, i.e. give
 In this section we provide some of the intermediate layer activations for the baseline model and our final unet model.   
 
 **Baseline activations for a sample image**   
-*Layer 1*   
-![alt](images/baseline_activations1.png)   
-*Layer 2*   
+*Layer 1*                              *Layer 2*   
+![alt](images/baseline_activations1.png)
 ![alt](images/baseline_activations2.png)   
 *Final Output Layer*   
 ![alt](images/baseline_activations3.png)   
@@ -280,7 +279,18 @@ These images show that the filters are progressively extracting a more generaliz
 ### Reflection
 
 In this project, I tackle a simpler form of the more general object segmentation problem found in many computer vision applications. The approach I have taken is also extendable to those problems. We are provided with input images of automobiles photographed in a studio setting. This also makes the learning process much simpler than the general problem. 
-I use a UNet based CNN model to learn pixel-wise mask from a given image. This helps in maintaining local information about image regions and hence can give much better results for segmentation tasks than vanilla CNNs. We have used a very low resolution input image to make these predictions and still were able to get a *good* score.
+I use a UNet based CNN model to learn pixel-wise mask from a given image. This helps in maintaining local information about image regions and hence can give much better results for segmentation tasks than vanilla CNNs. We have used a very low resolution input image to make these predictions and still were able to get a *good* score.    
+
+</br>
+
+Here are the final results,   
+
+| Model                 | Kaggle Score | Validation Score |
+|-----------------------|--------------|------------------|
+| Baseline : Avg Mask   | **0.7491**   | **0.743401**     |
+| Baseline : Simple CNN | **0.8848**   | **0.889419**     |
+| Unet (128X128)        | **0.9886**   | **0.989057**     |
+
 U-Nets and CNNs in general are taking over the domain of computer vision applications and are expected to drive the domain much further in the coming future. 
 
 ### Improvement
