@@ -128,25 +128,65 @@ def vis_manufacturer_distribution():
     plt.show()
 
 def plot_manufacturer_stats():
-    pd.read_csv("logs/man.csv")[['acc', 'loss', 'val_acc', 'val_loss']].plot()
-
-def plot_baseline_stats():
-    # baseline_history_DF = pd.DataFrame(baseline_history.history)
-    baseline_history_DF = pd.read_csv('logs/baseline.csv')
+    man_history_DF = pd.read_csv('logs/man.csv')
     fig, axes = plt.subplots(nrows = 1, ncols = 2, figsize=(10, 5))
-    baseline_history_DF[['dice_coef', 'val_dice_coef']].plot(ax = axes[0]);
+    ax = man_history_DF[['acc', 'val_acc']].plot(ax = axes[0]);
+    ax.set_title('model accuracy')
+    ax.set_xlabel('epoch')
+    ax.set_ylabel('accuracy')
     # pd.DataFrame(baseline_history.history)[['acc', 'val_acc']].plot()
-    baseline_history_DF[['loss', 'val_loss']].plot(ax = axes[1])
+    ax = man_history_DF[['loss', 'val_loss']].plot(ax = axes[1])
+    ax.set_title('model loss')
+    ax.set_xlabel('epoch')
+    ax.set_ylabel('loss')
     fig.show()
 
+
+def plot_final_results():
+    """ Plots a comparison score between the three models"""
+    """ The results are hardcoded here for simplicity."""
+    res = [[0.7491, 0.743401], [0.8848, 0.8894190], [0.9886, 0.989057]]
+    res_pd = pd.DataFrame(res)
+    res_pd.columns = ['Kaggle Score', 'Validation Score']
+    ax = res_pd.plot()
+    ax.set_title('Final results')
+    ax.set_xlabel('Models')
+    ax.set_ylabel('Score')
+    ax.set_xticks(np.arange(0,3,1))
+    labels=[item.get_text() for item in ax.get_xticklabels()]
+    labels[0] = 'Avg Mask Benchmark'
+    labels[1] = 'Simple CNN Benchmark'
+    labels[2] = 'Unet (128X128)'
+    ax.set_xticklabels(labels)
+
+def plot_baseline_stats():
+    baseline_history_DF = pd.read_csv('logs/baseline.csv')
+    fig, axes = plt.subplots(nrows = 1, ncols = 2, figsize=(10, 5))
+    # plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    baseline_history_DF[['dice_coef', 'val_dice_coef']].plot(ax = axes[0]);
+    # plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    baseline_history_DF[['loss', 'val_loss']].plot(ax = axes[1])
+    fig.suptitle("Learning curve for Baseline model")
+    # plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    axes[0].set_xlabel('epoch')
+    axes[0].set_ylabel('Dice coef')
+    axes[1].set_xlabel('epoch')
+    axes[1].set_ylabel('Loss')
+    # plt.tight_layout()
+
 def plot_unet128_stats():
-    print("Here,..")
     # baseline_history_DF = pd.DataFrame(baseline_history.history)
     unet_128_history = pd.read_csv('logs/unet_128_history.csv')
     fig, axes = plt.subplots(nrows = 1, ncols = 2, figsize=(10, 5))
     unet_128_history[['dice_coeff', 'val_dice_coeff']].plot(ax = axes[0]);
     # pd.DataFrame(baseline_history.history)[['acc', 'val_acc']].plot()
     unet_128_history[['loss', 'val_loss']].plot(ax = axes[1])
+    fig.suptitle("U-Net Model")
+    # plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    axes[0].set_xlabel('epoch')
+    axes[0].set_ylabel('Dice coeff')
+    axes[1].set_xlabel('epoch')
+    axes[1].set_ylabel('Loss')
     fig.show()
 
 
