@@ -49,7 +49,12 @@ X & Y = 6
 So, 
 QS = (2 * 6)/(8 + 8)   
 QS = 0.75    
-```
+```   
+This is an appropriate statistic for image segmentation task as it takes into account and penalizes the 
+result for false positives as well as false negatives. This is not the case with the [precision or recall](https://en.wikipedia.org/wiki/Precision_and_recall) statistics. Dice coefficient is 
+mathematically equivalent to [F1 score](https://en.wikipedia.org/wiki/F1_score) which is the harmonic 
+mean of precision and recall. 
+
 The final score can be calculated as the mean of the Dice coefficients for each image in the test set.   
 
 We can convert this to a loss function by using    
@@ -81,6 +86,11 @@ Corresponding to each car image we have a single channel mask. Our goal is to mo
 Here are some samples shown with masks overlaid,   
 ![alt](images/vis2.png)   
 
+#### Corrupt data   
+During random visualization of the dataset i was able to find out a few samples that do not have a (nearly)perfect mask. These anomalies are mostly because of very thin appendages such as spoilers or antennas, regular patterns such as wheel spokes or translucent features such as glasses. These samples may cause issues, and we can try to improve the score by removing these samples from the train dataset. However, I have decided to not remove these samples and rely on data augmentation to provide regularization effects against these samples.   
+![alt](images/curroptedF.png)   
+
+### Exploratory Visualization
 #### Car manufacturer distribution   
 Also, we can get a distribution of car manufacturers in the complete dataset.   
 ![alt](images/metadata.png)   
@@ -100,11 +110,6 @@ Here is the learning graph for the model.
 ![alt](images/man_plot.png)   
 
 This model can also be improved by using data augmentation methods used in the following sections.
-
-#### Corrupt data   
-during random visualization of the dataset i was able to find out a few samples that do not have a (nearly)perfect mask. These anomalies are mostly because of very thin appendages such as spoilers or antennas, regular patterns such as wheel spokes or translucent features such as glasses. These samples may cause issues, and we can try to improve the score by removing these samples from the train dataset. However, I have decided to not remove these samples and rely on data augmentation to provide regularization effects against these samples.   
-![alt](images/curroptedF.png)   
-
 
 ### Algorithms and Techniques   
 
@@ -251,6 +256,18 @@ More results can be seen by running the program.
 
 Here we can see that the model is able to segment a vehicle, given the background has a relatively uniform colors, with no particularly noticeable features.   
 
+With the given model performance, we can use it for the original problem of finding optimal masks for vehicles photographed in a studio setting, which would then be used for overlaying models in various different settings for demonstrative visualizations.   
+
+
+### Justification
+
+We can now plot our final scores.   
+![alt](images/final_result.png)   
+
+This shows a clear improvement of our selected model over the specified benchmark models.   
+The final solution does solve the original problem. However, better overall performance can certainly be achieved by just using higher resolution input images(this is discussed further in the *Improvement* section).   
+Moreover, this model is not suitable for dealing with *real world* images with non uniform backgrounds, but this problem can also be minimized if we train on *real world* data, or maybe augment our studio based data with outdoor scenery/landscapes and train on that. This can be another extension for the project. 
+
 ## V. Conclusion
 
 ### Free-Form Visualization
@@ -278,8 +295,9 @@ These images show that the filters are progressively extracting a more generaliz
 
 ### Reflection
 
-In this project, I tackle a simpler form of the more general object segmentation problem found in many computer vision applications. The approach I have taken is also extendable to those problems. We are provided with input images of automobiles photographed in a studio setting. This also makes the learning process much simpler than the general problem. 
-I use a UNet based CNN model to learn pixel-wise mask from a given image. This helps in maintaining local information about image regions and hence can give much better results for segmentation tasks than vanilla CNNs. We have used a very low resolution input image to make these predictions and still were able to get a *good* score.    
+In this project, I tackle a simpler form of the more general object segmentation problem found in many computer vision applications. The approach I have taken is also extendable to those problems.   
+We are provided with input images of automobiles photographed in a studio setting. Sp, the images input images have a uniform background. This also makes the learning process much simpler than the general problem. 
+I use a UNet based CNN model to learn pixel-wise mask from a given image. This helps in maintaining local information about image regions and hence can give much better results for segmentation tasks than vanilla CNNs. Also, we augment this data to provide some invariance towards image(background) color as long as it is uniform, and towards variations in scale and rotation of the automobile. We have used a very low resolution input image to make these predictions and still were able to get a *good* score.    
 
 </br>
 
@@ -291,7 +309,10 @@ Here are the final results,
 | Baseline : Simple CNN | **0.8848**   | **0.889419**     |
 | Unet (128X128)        | **0.9886**   | **0.989057**     |
 
-U-Nets and CNNs in general are taking over the domain of computer vision applications and are expected to drive the domain much further in the coming future. 
+U-Nets and CNNs in general are taking over the domain of computer vision applications and are expected to drive the domain much further in the coming future.   
+One of the most interesting parts about this project was to see how well even simple CNN models are able to learn computer vision tasks. Also, during the implementation phase I became much more familiar with some salient aspects of neural network API's in general and this knowledge would be immensly useful in future projects.
+
+The final model produced here is well beyond my initial expectations, with room left for scope of improvement. I would say that model can be used in the real world application of this problem with some of the improvements mentioned in the next section to achieve a better result in even higher resolution imagery.  
 
 ### Improvement
 
