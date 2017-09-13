@@ -197,6 +197,34 @@ The project is implemented in `python 3` using `Keras` for building and training
 
 The project is initially implemented in *Jupyter Notebooks* for exploration and then plugged into a console program using `run.py`.
 
+##### Training summary
+```python
+def trainUnet128Model():
+    unet_model = models.get_unet_128()
+
+    callbacks = [ModelCheckpoint(filepath='models/unet_128.best_weights.hdf5',
+                                 monitor = 'val_loss', verbose=2, save_best_only=True),
+                CSVLogger('./logs/unet_128_history.csv'),
+                EarlyStopping(monitor='val_loss', patience=8, verbose=1, min_delta=1e-4),
+                ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=4, verbose=1, epsilon=1e-4),
+                TQDMCallback()]
+
+    steps_per_epoch = int(np.ceil(float(len(train_images)) / float(BATCH_SIZE)))
+    validation_steps = int(np.ceil(float(len(validation_images)) / float(BATCH_SIZE)))
+    
+    unet_model_history = unet_model.fit_generator(generator = train_generator(),
+                        steps_per_epoch = steps_per_epoch, verbose = 0,
+                        epochs = 100, validation_steps = validation_steps,
+                        validation_data=valid_generator(), callbacks = callbacks)
+
+    return unet_model_history
+```
+The above code snippet shows the method `trainUnet128Model()` from [train_val.py](train_val.py). This method summarizes the complete trining process along with the relevant parameters. 
+* Get the model from `get_unet_128()` defined in [utils/models.py](utils/models.py). Model architecture is explained thoroughly in the *Model Architecture* section.
+* Add callbacks for monitoring, backup and tweak the learning process.
+* Start the learning process with data generated using `train_generator()` and `valid_generator()` defined in [utils/generator.py](utils/generator.py) for a maximum of `100` epochs.
+
+
 #### Metrics
 As previously discussed, we are using `dice coefficient` as our metric for accuracy. This is converted to a loss function by using `dice_loss = 1 - dice_coeff`. 
 
